@@ -1,11 +1,17 @@
 /*
-This stylesheet sets up the lakeside picnic on top of base.css: where each object starts on
-every screen shape.
+This stylesheet sets up the lakeside picnic on top of base.css: where the sky and the ground
+begin in its picture, and where each object starts on every screen shape.
 */
 
 /* Lakeside scene */
 
+/*
+The sky line sits at the top of the lake and the ground line at the picnic blanket, so
+the three pitch zones follow what a child can see in the picture.
+*/
 .gardenScene {
+    --skyLine: 40%;
+    --groundLine: 72%;
     background-color: #f6bcd3;
 }
 
@@ -97,6 +103,11 @@ every screen shape.
 /* Portrait screens */
 
 @media (orientation: portrait) {
+    .gardenScene {
+        --skyLine: 33%;
+        --groundLine: 70%;
+    }
+
     #garden-rake {
         --x: 90%;
         --y: 65%;
