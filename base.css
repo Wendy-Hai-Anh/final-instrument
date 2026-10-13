@@ -1,6 +1,6 @@
 /*
-This stylesheet holds the layout shared by every garden. Each garden sets where its objects
-start in a second stylesheet.
+This stylesheet holds the layout shared by every garden. Each garden adds its pitch zone lines
+and object starting places in a second stylesheet.
 */
 
 /* Colour tokens */
@@ -178,7 +178,7 @@ and the invisible margin gives small fingers a larger target than the drawing it
 
 /*
 Tall screens use a taller garden instead of a squashed wide one, so objects keep a
-comfortable size and have room to be moved up and down.
+comfortable size and have room to move up and down between the pitch zones.
 */
 @media (orientation: portrait) {
     .gardenScene {
