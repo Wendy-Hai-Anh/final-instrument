@@ -7,14 +7,15 @@
     <title>Garden of Sounds: Giant Flower Meadow</title>
     <link rel="stylesheet" href="../../base.css">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/tone@15.1.22/build/Tone.js" defer></script>
     <script src="../../garden.js" defer></script>
 </head>
 
 <body>
     <!--
-    This version shows the garden from a bug's height, with giant flowers against a bright
-    sky and a mossy log across the meadow, inspired by flat picture-book illustration. The
-    objects and their IDs match the other garden versions.
+    This version shows a meadow from a bug's-eye view with giant flowers and a fallen log.
+    The garden is one still picture and every object is its own picture, so a child can tap
+    the objects to play them and drag them anywhere in the garden.
     -->
 
     <header class="pageHeader">
@@ -22,11 +23,14 @@
     </header>
 
     <main class="gardenStage">
+        <!-- The key and tempo keep every object in this garden in tune and in time. -->
         <section
             id="garden-scene"
             class="gardenScene"
+            data-key="F"
+            data-tempo="92"
             aria-labelledby="garden-scene-title"
-            aria-describedby="garden-scene-description">
+            aria-describedby="garden-scene-description garden-scene-instructions">
             <h2 id="garden-scene-title" class="visuallyHidden">Giant flower meadow</h2>
             <p id="garden-scene-description" class="visuallyHidden">
                 A bright meadow seen from very close to the ground. Giant white,
@@ -35,6 +39,11 @@
                 snail, a flowerpot and the bird sit on the log, the butterfly floats
                 in the open sky, and the other tools and fruit lie in the grass
                 below.
+            </p>
+            <p id="garden-scene-instructions" class="visuallyHidden">
+                Tap an object to start or stop its sound, and drag it to move it. Objects
+                higher in the garden play higher notes, and objects further right repeat
+                faster.
             </p>
 
             <!-- The garden is one still picture, made for each screen shape. -->
@@ -49,29 +58,29 @@
                 <img class="gardenPicture" src="assets/backgrounds/wide.webp" alt="">
             </picture>
 
-            <!-- Each object keeps the same ID in every garden. -->
+            <!-- Each musical object keeps the same ID in every garden. -->
             <ul class="objectLayer" aria-label="Garden objects">
                 <!-- Gardening tools lie in the grass, with the flowerpot up on the log. -->
                 <li id="garden-rake" class="gardenObject" data-category="gardening-tool">
-                    <button class="objectButton" type="button">
+                    <button class="objectButton" type="button" aria-pressed="false">
                         <img class="objectImage" src="assets/objects/garden-rake.webp"
                             alt="Rake" width="191" height="437" draggable="false">
                     </button>
                 </li>
                 <li id="flower-pot" class="gardenObject" data-category="gardening-tool">
-                    <button class="objectButton" type="button">
+                    <button class="objectButton" type="button" aria-pressed="false">
                         <img class="objectImage" src="assets/objects/flower-pot.webp"
                             alt="Flowerpot" width="225" height="265" draggable="false">
                     </button>
                 </li>
                 <li id="hand-trowel" class="gardenObject" data-category="gardening-tool">
-                    <button class="objectButton" type="button">
+                    <button class="objectButton" type="button" aria-pressed="false">
                         <img class="objectImage" src="assets/objects/hand-trowel.webp"
                             alt="Trowel" width="321" height="161" draggable="false">
                     </button>
                 </li>
                 <li id="watering-can" class="gardenObject" data-category="gardening-tool">
-                    <button class="objectButton" type="button">
+                    <button class="objectButton" type="button" aria-pressed="false">
                         <img class="objectImage" src="assets/objects/watering-can.webp"
                             alt="Watering can" width="352" height="264" draggable="false">
                     </button>
@@ -79,19 +88,19 @@
 
                 <!-- The bird and snail sit on the log and the butterfly floats in the sky. -->
                 <li id="garden-bird" class="gardenObject" data-category="animal">
-                    <button class="objectButton" type="button">
+                    <button class="objectButton" type="button" aria-pressed="false">
                         <img class="objectImage" src="assets/objects/garden-bird.webp"
                             alt="Bird" width="256" height="214" draggable="false">
                     </button>
                 </li>
                 <li id="garden-butterfly" class="gardenObject" data-category="animal">
-                    <button class="objectButton" type="button">
+                    <button class="objectButton" type="button" aria-pressed="false">
                         <img class="objectImage" src="assets/objects/butterfly.webp"
                             alt="Butterfly" width="239" height="200" draggable="false">
                     </button>
                 </li>
                 <li id="garden-snail" class="gardenObject" data-category="animal">
-                    <button class="objectButton" type="button">
+                    <button class="objectButton" type="button" aria-pressed="false">
                         <img class="objectImage" src="assets/objects/garden-snail.webp"
                             alt="Snail" width="321" height="230" draggable="false">
                     </button>
@@ -99,25 +108,28 @@
 
                 <!-- Fruits lie in the grass beside the basket below the log. -->
                 <li id="green-pear" class="gardenObject" data-category="fruit">
-                    <button class="objectButton" type="button">
+                    <button class="objectButton" type="button" aria-pressed="false">
                         <img class="objectImage" src="assets/objects/green-pear.webp"
                             alt="Pear" width="179" height="239" draggable="false">
                     </button>
                 </li>
                 <li id="red-apple" class="gardenObject" data-category="fruit">
-                    <button class="objectButton" type="button">
+                    <button class="objectButton" type="button" aria-pressed="false">
                         <img class="objectImage" src="assets/objects/red-apple.webp"
                             alt="Apple" width="211" height="228" draggable="false">
                     </button>
                 </li>
                 <li id="strawberry" class="gardenObject" data-category="fruit">
-                    <button class="objectButton" type="button">
+                    <button class="objectButton" type="button" aria-pressed="false">
                         <img class="objectImage" src="assets/objects/strawberry.webp"
                             alt="Strawberry" width="167" height="195" draggable="false">
                     </button>
                 </li>
             </ul>
         </section>
+
+        <p id="sound-status" class="visuallyHidden" role="status"></p>
+        <noscript>Turn on JavaScript to play the garden.</noscript>
     </main>
 </body>
 

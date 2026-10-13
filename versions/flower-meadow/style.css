@@ -1,11 +1,17 @@
 /*
-This stylesheet sets up the giant flower meadow on top of base.css: where each object starts on
-every screen shape.
+This stylesheet sets up the giant flower meadow on top of base.css: where the sky and the ground
+begin in its picture, and where each object starts on every screen shape.
 */
 
 /* Giant flower meadow scene */
 
+/*
+The sky line sits at the top of the hills and the ground line just below the log, so
+the three pitch zones follow what a child can see in the picture.
+*/
 .gardenScene {
+    --skyLine: 55%;
+    --groundLine: 81%;
     background-color: #86c4ea;
 }
 
@@ -99,6 +105,11 @@ every screen shape.
 /* Portrait screens */
 
 @media (orientation: portrait) {
+    .gardenScene {
+        --skyLine: 47%;
+        --groundLine: 72%;
+    }
+
     #garden-rake {
         --x: 86%;
         --y: 83%;
