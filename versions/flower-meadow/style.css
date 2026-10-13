@@ -1,6 +1,7 @@
 /*
-This stylesheet sets up the giant flower meadow on top of base.css: where the sky and the ground
-begin in its picture, and where each object starts on every screen shape.
+This stylesheet sets up the giant flower meadow on top of base.css: its glow colour,
+where the sky and the ground begin in its picture, and where each object starts on
+every screen shape.
 */
 
 /* Giant flower meadow scene */
@@ -12,6 +13,7 @@ the three pitch zones follow what a child can see in the picture.
 .gardenScene {
     --skyLine: 55%;
     --groundLine: 81%;
+    --glowColour: #fff07a;
     background-color: #86c4ea;
 }
 
