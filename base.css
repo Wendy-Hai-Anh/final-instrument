@@ -1,6 +1,6 @@
 /*
-This stylesheet holds the layout shared by every garden. Each garden adds its pitch zone lines
-and object starting places in a second stylesheet.
+This stylesheet holds the layout and feedback shared by every garden. Each garden adds its glow
+colour, pitch zone lines and object starting places in a second stylesheet.
 */
 
 /* Colour tokens */
@@ -14,6 +14,7 @@ and object starting places in a second stylesheet.
     --earthBrown: #8c684d;
     --butterYellow: #f7cb5c;
     --coral: #ef7a6d;
+    --glowCore: #fffbe8;
     --headerHeight: 3rem;
     --stageGap: 1rem;
 }
@@ -95,6 +96,14 @@ A fixed ratio means a percentage position always lands on the same patch of the 
     user-select: none;
 }
 
+/* Ripples sit on the picture but under the objects, so they read as part of the ground. */
+.rippleLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
 .objectLayer {
     position: absolute;
     inset: 0;
@@ -172,6 +181,120 @@ and the invisible margin gives small fingers a larger target than the drawing it
 
 .isDragging .objectImage {
     filter: drop-shadow(0 0.6rem 0.35rem rgb(38 56 50 / 28%));
+}
+
+/* Tap feedback */
+
+/*
+Adapted from Prototype 5, the tap response most testers found clearest. The glow now follows
+the object's own outline instead of a circle, and its colour comes from the garden's palette.
+*/
+.gardenObject.isGlowing .objectImage {
+    animation: object-glow var(--glowDuration, 0.7s) ease-out both;
+}
+
+.objectButton::after {
+    position: absolute;
+    inset: -15%;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, var(--glowCore) 0%, var(--glowColour) 45%,
+            transparent 100%);
+    opacity: 0;
+    pointer-events: none;
+    content: "";
+}
+
+.gardenObject.isGlowing .objectButton::after {
+    animation: glow-wave var(--glowDuration, 0.7s) ease-out both;
+}
+
+/* A pale core keeps the glow visible even where the garden colour matches the glow colour. */
+@keyframes object-glow {
+    0%,
+    100% {
+        filter: brightness(1) saturate(1) drop-shadow(0 0 0 transparent)
+            drop-shadow(0 0 0 transparent);
+    }
+
+    10%,
+    30% {
+        filter: brightness(1.15) saturate(1.35) drop-shadow(0 0 0.2rem var(--glowCore))
+            drop-shadow(0 0 0.8rem var(--glowColour));
+    }
+
+    60% {
+        filter: brightness(1.07) saturate(1.15) drop-shadow(0 0 0.1rem var(--glowCore))
+            drop-shadow(0 0 1.2rem var(--glowColour));
+    }
+}
+
+/* The soft wave fades as it grows, finishing with the note's release like Prototype 5. */
+@keyframes glow-wave {
+    0% {
+        opacity: 0;
+        scale: 0.6;
+    }
+
+    15% {
+        opacity: 0.85;
+    }
+
+    100% {
+        opacity: 0;
+        scale: 1.5;
+    }
+}
+
+/* Drop feedback */
+
+/*
+Adapted from Prototype 6. Testers found its full-garden ripple gentle but sometimes distracting,
+so one small ring now spreads flat across the ground only where an object is put down.
+*/
+.groundRipple {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--rippleWidth);
+    aspect-ratio: 3;
+    border: 0.18rem solid rgb(255 255 255 / 80%);
+    border-radius: 50%;
+    translate: -50% -50%;
+    animation: ground-ripple 0.8s ease-out both;
+}
+
+@keyframes ground-ripple {
+    0% {
+        opacity: 0.9;
+        scale: 0.4;
+    }
+
+    100% {
+        opacity: 0;
+        scale: 1.8;
+    }
+}
+
+/* Reduced motion keeps every response but removes the growing waves. */
+@media (prefers-reduced-motion: reduce) {
+    .gardenObject.isGlowing .objectButton::after {
+        animation: none;
+    }
+
+    .groundRipple {
+        animation-name: ground-ripple-still;
+    }
+
+    @keyframes ground-ripple-still {
+        0% {
+            opacity: 0.9;
+        }
+
+        100% {
+            opacity: 0;
+        }
+    }
 }
 
 /* Portrait screens */

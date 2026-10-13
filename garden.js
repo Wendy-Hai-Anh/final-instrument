@@ -3,17 +3,21 @@
 /*
 This script makes every garden object playable. An object's height picks its register and its
 place from left to right picks how often it repeats. A tap starts or stops its sound, and a drag
-moves it.
+moves it. Each kind of action has its own feedback: a tap glows, every note moves the object and
+a drop sends a ripple across the ground.
 */
 
 /* Page elements and settings ------------------------------------------------ */
 const gardenScene = document.querySelector(".gardenScene");
+const rippleLayer = document.querySelector(".rippleLayer");
 const soundStatus = document.querySelector("#sound-status");
+const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 const gardenKey = gardenScene.dataset.key;
 const gardenTempo = Number(gardenScene.dataset.tempo);
 const dragThreshold = 8;
 const zoneMargin = 1.5;
 const keyStep = 4;
+const maxRipples = 6;
 
 /* Musical mapping ----------------------------------------------------------- */
 // Pentatonic steps never clash, so any mix of objects and places stays in tune.
@@ -69,6 +73,7 @@ const families = {
         restChance: 0,
         noteLength: 0.2,
         volume: -10,
+        motion: "sway",
         createSynth: () => new Tone.MembraneSynth({
             pitchDecay: 0.03,
             octaves: 2.5,
@@ -87,6 +92,7 @@ const families = {
         restChance: 0.2,
         noteLength: 0.22,
         volume: -7,
+        motion: "hop",
         createSynth: () => new Tone.Synth({
             oscillator: {
                 type: "triangle"
@@ -106,6 +112,7 @@ const families = {
         restChance: 0,
         noteLength: 1.2,
         volume: -6,
+        motion: "swell",
         createSynth: () => new Tone.AMSynth({
             harmonicity: 2,
             envelope: {
@@ -306,6 +313,9 @@ function playNote(gardenObject, time, velocity) {
     synth.triggerAttackRelease(chooseNote(gardenObject), gardenObject.family.noteLength, time,
         velocity);
     gardenObject.lastNoteTime = time;
+
+    // Tone's Draw runs the movement on the frame that matches the note, as in Prototype 8.
+    Tone.getDraw().schedule(() => moveWithNote(gardenObject), time);
 }
 
 function playBeat(time) {
@@ -326,6 +336,82 @@ function playBeat(time) {
     });
 }
 
+/* Feedback ------------------------------------------------------------------ */
+/*
+Adapted from Prototype 8, which testers found clearest for a repeating sound: the object moves
+once with every note. Each family has its own movement, and the fruit's swell reuses Prototype 4's
+grow-and-bounce as a repeating effect, as one tester suggested.
+*/
+const motions = {
+    sway: {
+        duration: 380,
+        keyframes: amount => [
+            { transform: "rotate(0deg)" },
+            { transform: `rotate(${-9 * amount}deg)` },
+            { transform: `rotate(${7 * amount}deg)` },
+            { transform: "rotate(0deg)" }
+        ]
+    },
+    hop: {
+        duration: 340,
+        keyframes: amount => [
+            { transform: "translateY(0)" },
+            { transform: `translateY(${-14 * amount}%)` },
+            { transform: "translateY(0)" }
+        ]
+    },
+    swell: {
+        duration: 520,
+        keyframes: amount => [
+            { transform: "scale(1)" },
+            { transform: `scale(${1 + 0.1 * amount})` },
+            { transform: `scale(${1 - 0.03 * amount})` },
+            { transform: "scale(1)" }
+        ]
+    }
+};
+
+function moveWithNote(gardenObject) {
+    const motion = motions[gardenObject.family.motion];
+    // Reduced motion keeps the movement, but much smaller.
+    const amount = reducedMotionQuery.matches ? 0.35 : 1;
+    // Each movement ends before the next note, so fast rhythms stay readable.
+    const duration = Math.min(motion.duration, getBeatSeconds(gardenObject) * 900);
+
+    gardenObject.image.animate(motion.keyframes(amount), {
+        duration,
+        easing: "ease-out"
+    });
+}
+
+function glowObject(gardenObject) {
+    gardenObject.item.classList.remove("isGlowing");
+
+    // Reading layout lets the same class restart after rapid repeated taps, as in Prototype 5.
+    void gardenObject.item.offsetWidth;
+    gardenObject.item.classList.add("isGlowing");
+}
+
+function createRipple(gardenObject) {
+    // Keep the number of rings small even when a child moves objects very quickly.
+    while (rippleLayer.childElementCount >= maxRipples) {
+        rippleLayer.firstElementChild.remove();
+    }
+
+    const { x, y } = readPosition(gardenObject);
+    const ripple = document.createElement("span");
+
+    ripple.className = "groundRipple";
+    ripple.style.setProperty("--x", `${x}%`);
+    ripple.style.setProperty("--y", `${y}%`);
+    ripple.style.setProperty("--rippleWidth", `${gardenObject.item.offsetWidth * 1.4}px`);
+    rippleLayer.append(ripple);
+
+    // The timer covers browsers that skip the end event, for example in a hidden tab.
+    ripple.addEventListener("animationend", () => ripple.remove());
+    setTimeout(() => ripple.remove(), 1200);
+}
+
 /* Tapping ------------------------------------------------------------------- */
 async function toggleObject(gardenObject) {
     if (!(await prepareAudio())) return;
@@ -337,6 +423,7 @@ async function toggleObject(gardenObject) {
     // Every tap sounds: a start plays its first note at once, and a stop plays one quiet note.
     const velocity = gardenObject.isPlaying ? 0.7 : 0.35;
     playNote(gardenObject, Tone.immediate() + 0.02, velocity);
+    glowObject(gardenObject);
 
     if (gardenObject.isPlaying) {
         announce(`${gardenObject.name} is playing ${describePlace(gardenObject)}.`);
@@ -393,6 +480,7 @@ function moveDrag(gardenObject, event) {
 
 async function dropObject(gardenObject, canStartAudio) {
     updatePlace(gardenObject);
+    createRipple(gardenObject);
     announce(`${gardenObject.name} moved ${describePlace(gardenObject)}.`);
 
     const isReady = canStartAudio ? await prepareAudio() : audioIsRunning();
@@ -445,7 +533,7 @@ function handleKey(gardenObject, event) {
 
 /* User input and setup ------------------------------------------------------ */
 gardenObjects.forEach(gardenObject => {
-    const { button } = gardenObject;
+    const { button, item } = gardenObject;
 
     button.addEventListener("pointerdown", event => startDrag(gardenObject, event));
     button.addEventListener("pointermove", event => moveDrag(gardenObject, event));
@@ -458,6 +546,10 @@ gardenObjects.forEach(gardenObject => {
         // Some browsers end a drag with a click, so a click just after a drop is ignored.
         if (performance.now() - gardenObject.dragEndedAt < 400) return;
         toggleObject(gardenObject);
+    });
+
+    item.addEventListener("animationend", event => {
+        if (event.animationName === "object-glow") item.classList.remove("isGlowing");
     });
 
     updatePlace(gardenObject);
