@@ -1,0 +1,54 @@
+/*
+This stylesheet lays out the page that links the garden versions. The gardens themselves are
+styled by base.css and each version's own stylesheet.
+*/
+
+/* Version page */
+
+.versionPage {
+    max-width: 40rem;
+    padding: 1rem var(--stageGap) 2rem;
+    margin: 0 auto;
+}
+
+.versionHeading {
+    margin: 1rem 0 0.5rem;
+    font-size: 1.6rem;
+    font-weight: normal;
+}
+
+.versionIntro {
+    margin: 0 0 1.5rem;
+    line-height: 1.5;
+}
+
+.versionList {
+    display: grid;
+    gap: 1rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+/* Each garden sits on a soft card so the three choices are easy to tell apart. */
+.versionItem {
+    padding: 1rem 1.25rem;
+    border-radius: 1.2rem 1.6rem 1.4rem 1.5rem;
+    background-color: rgb(255 255 255 / 60%);
+    box-shadow: 0 0.2rem 0 rgb(38 56 50 / 12%);
+}
+
+.versionLink {
+    color: var(--deepLeaf);
+    font-size: 1.25rem;
+}
+
+.versionLink:hover,
+.versionLink:focus-visible {
+    color: var(--coral);
+}
+
+.versionNote {
+    margin: 0.4rem 0 0;
+    line-height: 1.5;
+}

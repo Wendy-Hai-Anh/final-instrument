@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garden of Sounds: Painted Orchard</title>
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!--
+    This version paints the garden in soft gouache with no outlines on the scenery, inspired
+    by textured picture-book illustration. The objects and their IDs match the other garden
+    versions.
+    -->
+
+    <header class="pageHeader">
+        <h1 class="projectTitle">Garden of Sounds</h1>
+    </header>
+
+    <main class="gardenStage">
+        <section
+            id="garden-scene"
+            class="gardenScene"
+            aria-labelledby="garden-scene-title"
+            aria-describedby="garden-scene-description">
+            <h2 id="garden-scene-title" class="visuallyHidden">Painted orchard garden</h2>
+            <p id="garden-scene-description" class="visuallyHidden">
+                A golden, painted orchard under a warm amber sky. A round fruit tree
+                stands on the left with a bird on its branch, rows of seedlings grow
+                in the meadow, and tall foxgloves and sunflowers fill the right
+                side. Gardening tools sit by the seedlings, a butterfly visits the
+                foxgloves, a snail rests on a mossy stone and fruit lies beside a
+                basket under the tree.
+            </p>
+
+            <!-- The garden is one still picture, made for each screen shape. -->
+            <picture>
+                <source
+                    media="(orientation: portrait) and (max-width: 600px)"
+                    srcset="assets/backgrounds/phone.webp">
+                <source media="(orientation: portrait)" srcset="assets/backgrounds/tall.webp">
+                <source
+                    media="(orientation: landscape) and (max-height: 500px)"
+                    srcset="assets/backgrounds/short.webp">
+                <img class="gardenPicture" src="assets/backgrounds/wide.webp" alt="">
+            </picture>
+
+            <!-- Each object keeps the same ID in every garden. -->
+            <ul class="objectLayer" aria-label="Garden objects">
+                <!-- Gardening tools sit beside the rows of seedlings. -->
+                <li id="garden-rake" class="gardenObject" data-category="gardening-tool">
+                    <img src="assets/objects/garden-rake.webp"
+                        alt="Rake" width="191" height="437">
+                </li>
+                <li id="flower-pot" class="gardenObject" data-category="gardening-tool">
+                    <img src="assets/objects/flower-pot.webp"
+                        alt="Flowerpot" width="211" height="249">
+                </li>
+                <li id="hand-trowel" class="gardenObject" data-category="gardening-tool">
+                    <img src="assets/objects/hand-trowel.webp"
+                        alt="Trowel" width="321" height="161">
+                </li>
+                <li id="watering-can" class="gardenObject" data-category="gardening-tool">
+                    <img src="assets/objects/watering-can.webp"
+                        alt="Watering can" width="368" height="276">
+                </li>
+
+                <!-- Animals stay in the tree, by the foxgloves and on the stone. -->
+                <li id="garden-bird" class="gardenObject" data-category="animal">
+                    <img src="assets/objects/garden-bird.webp"
+                        alt="Bird" width="256" height="214">
+                </li>
+                <li id="garden-butterfly" class="gardenObject" data-category="animal">
+                    <img src="assets/objects/butterfly.webp"
+                        alt="Butterfly" width="239" height="200">
+                </li>
+                <li id="garden-snail" class="gardenObject" data-category="animal">
+                    <img src="assets/objects/garden-snail.webp"
+                        alt="Snail" width="321" height="230">
+                </li>
+
+                <!-- Fruits have fallen beside the basket under the orchard tree. -->
+                <li id="green-pear" class="gardenObject" data-category="fruit">
+                    <img src="assets/objects/green-pear.webp"
+                        alt="Pear" width="179" height="239">
+                </li>
+                <li id="red-apple" class="gardenObject" data-category="fruit">
+                    <img src="assets/objects/red-apple.webp"
+                        alt="Apple" width="211" height="228">
+                </li>
+                <li id="strawberry" class="gardenObject" data-category="fruit">
+                    <img src="assets/objects/strawberry.webp"
+                        alt="Strawberry" width="167" height="195">
+                </li>
+            </ul>
+        </section>
+    </main>
+</body>
+
+</html>

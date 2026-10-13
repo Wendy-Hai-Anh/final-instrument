@@ -1,0 +1,164 @@
+/*
+This stylesheet holds the layout shared by every garden. Each garden sets where its objects
+start in a second stylesheet.
+*/
+
+/* Colour tokens */
+
+:root {
+    --ink: #263832;
+    --cream: #f5f1e7;
+    --skyBlue: #cfe7f1;
+    --leafGreen: #8dbb69;
+    --deepLeaf: #5f9150;
+    --earthBrown: #8c684d;
+    --butterYellow: #f7cb5c;
+    --coral: #ef7a6d;
+    --headerHeight: 3rem;
+    --stageGap: 1rem;
+}
+
+/* Page */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    color: var(--ink);
+    background-color: var(--cream);
+    background-image: url("assets/textures/paper-grain.webp");
+    background-size: 20rem;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.pageHeader {
+    display: flex;
+    align-items: center;
+    height: var(--headerHeight);
+    padding: 0 var(--stageGap);
+}
+
+/* The title stays small so the garden, not the heading, fills the screen. */
+.projectTitle {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: normal;
+    letter-spacing: 0.04em;
+}
+
+.visuallyHidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* Garden stage */
+
+.gardenStage {
+    display: grid;
+    place-items: center;
+    min-height: calc(100svh - var(--headerHeight));
+    padding: 0 var(--stageGap) var(--stageGap);
+}
+
+/*
+The scene keeps a fixed aspect ratio and grows to the largest size that fits the viewport.
+A fixed ratio means a percentage position always lands on the same patch of the picture.
+*/
+.gardenScene {
+    --sceneRatio: 1.6;
+    --objectScale: 1;
+    position: relative;
+    width: min(100%, calc((100svh - var(--headerHeight) - var(--stageGap)) * var(--sceneRatio)));
+    aspect-ratio: var(--sceneRatio);
+    overflow: hidden;
+    border-radius: 1.6rem 2.2rem 1.8rem 2rem;
+    background-color: var(--skyBlue);
+    box-shadow: 0 0.2rem 0 rgb(38 56 50 / 12%);
+}
+
+/* Garden picture */
+
+/* The garden is one still picture. Each screen shape loads a picture made for that shape. */
+.gardenPicture {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    user-select: none;
+}
+
+.objectLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Garden objects */
+
+/*
+Every object is placed by its base point: --x and --y mark where it touches the ground, and --w
+sets its width as a share of the scene. Height follows the picture's own proportions.
+*/
+.gardenObject {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: calc(var(--w) * var(--objectScale));
+    translate: -50% -100%;
+}
+
+.gardenObject img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* Portrait screens */
+
+/*
+Tall screens use a taller garden instead of a squashed wide one, so objects keep a
+comfortable size and have room to be moved up and down.
+*/
+@media (orientation: portrait) {
+    .gardenScene {
+        --sceneRatio: 0.75;
+    }
+}
+
+@media (orientation: portrait) and (max-width: 600px) {
+    :root {
+        --headerHeight: 2.5rem;
+        --stageGap: 0.75rem;
+    }
+
+    /* Phones use a taller garden and slightly larger objects so each one is easy to touch. */
+    .gardenScene {
+        --sceneRatio: 0.5;
+        --objectScale: 1.25;
+    }
+}
+
+/* Short landscape screens */
+
+/* A wider garden on short screens such as landscape phones uses more of the available width. */
+@media (orientation: landscape) and (max-height: 500px) {
+    :root {
+        --headerHeight: 2.25rem;
+        --stageGap: 0.5rem;
+    }
+
+    .gardenScene {
+        --sceneRatio: 1.9;
+    }
+}

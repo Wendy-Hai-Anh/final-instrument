@@ -1,0 +1,180 @@
+/*
+This stylesheet sets up the giant flower meadow on top of base.css: where each object starts on
+every screen shape.
+*/
+
+/* Giant flower meadow scene */
+
+.gardenScene {
+    background-color: #86c4ea;
+}
+
+/* Landscape starting places */
+
+#garden-rake {
+    --x: 83%;
+    --y: 93%;
+    --w: 6%;
+    rotate: 10deg;
+}
+
+/* The flowerpot, snail and bird start on the log's grassy top. */
+#flower-pot {
+    --x: 49%;
+    --y: 67.5%;
+    --w: 7%;
+}
+
+#hand-trowel {
+    --x: 21%;
+    --y: 94%;
+    --w: 10%;
+    rotate: -8deg;
+}
+
+#watering-can {
+    --x: 71%;
+    --y: 95%;
+    --w: 11%;
+}
+
+#garden-bird {
+    --x: 62%;
+    --y: 67.5%;
+    --w: 8%;
+}
+
+/* The butterfly floats in the open sky between the giant flowers. */
+#garden-butterfly {
+    --x: 36%;
+    --y: 28%;
+    --w: 7.5%;
+    rotate: -8deg;
+}
+
+#garden-snail {
+    --x: 36%;
+    --y: 67.5%;
+    --w: 10%;
+}
+
+#green-pear {
+    --x: 34%;
+    --y: 93%;
+    --w: 5.6%;
+}
+
+#red-apple {
+    --x: 53%;
+    --y: 95%;
+    --w: 6.6%;
+}
+
+#strawberry {
+    --x: 59%;
+    --y: 97%;
+    --w: 5.2%;
+}
+
+/* Short landscape screens */
+
+@media (orientation: landscape) and (max-height: 500px) {
+    /*
+    On the wider picture the log sits higher, so the objects resting on it start higher to stay
+    on them.
+    */
+    #flower-pot {
+        --y: 65.9%;
+    }
+
+    #garden-bird {
+        --y: 65.9%;
+    }
+
+    #garden-snail {
+        --y: 65.9%;
+    }
+}
+
+/* Portrait screens */
+
+@media (orientation: portrait) {
+    #garden-rake {
+        --x: 86%;
+        --y: 83%;
+        --w: 9.5%;
+        rotate: 8deg;
+    }
+
+    #flower-pot {
+        --x: 50%;
+        --y: 59%;
+        --w: 12%;
+    }
+
+    #hand-trowel {
+        --x: 17%;
+        --y: 83%;
+        --w: 18%;
+    }
+
+    #watering-can {
+        --x: 68%;
+        --y: 96%;
+        --w: 20%;
+    }
+
+    #garden-bird {
+        --x: 66%;
+        --y: 59%;
+        --w: 13%;
+    }
+
+    #garden-butterfly {
+        --x: 50%;
+        --y: 22%;
+        --w: 13%;
+    }
+
+    #garden-snail {
+        --x: 33%;
+        --y: 59%;
+        --w: 17%;
+    }
+
+    #green-pear {
+        --x: 62%;
+        --y: 82%;
+        --w: 9%;
+    }
+
+    #red-apple {
+        --x: 36%;
+        --y: 96%;
+        --w: 11%;
+    }
+
+    #strawberry {
+        --x: 49%;
+        --y: 97.5%;
+        --w: 8.5%;
+    }
+}
+
+@media (orientation: portrait) and (max-width: 600px) {
+    /*
+    On the narrower phone picture the log is thinner, so the objects resting on it start lower
+    to stay on them.
+    */
+    #flower-pot {
+        --y: 60.7%;
+    }
+
+    #garden-bird {
+        --y: 60.7%;
+    }
+
+    #garden-snail {
+        --y: 60.7%;
+    }
+}

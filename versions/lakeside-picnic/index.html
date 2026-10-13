@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garden of Sounds: Lakeside Picnic</title>
+    <link rel="stylesheet" href="../../base.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!--
+    This version sets the garden beside a lake, inspired by bold, flat picture-book line
+    work. The objects and their IDs match the other garden versions so later interaction works
+    in every version.
+    -->
+
+    <header class="pageHeader">
+        <h1 class="projectTitle">Garden of Sounds</h1>
+    </header>
+
+    <main class="gardenStage">
+        <section
+            id="garden-scene"
+            class="gardenScene"
+            aria-labelledby="garden-scene-title"
+            aria-describedby="garden-scene-description">
+            <h2 id="garden-scene-title" class="visuallyHidden">Lakeside picnic garden</h2>
+            <p id="garden-scene-description" class="visuallyHidden">
+                A spring meadow beside a calm lake, with a big pink blossom tree on
+                the right and a pink gingham blanket on the grass. Gardening tools
+                rest by the tree, a bird sits on its branch, a butterfly visits a
+                flowering bush, a snail rests on a boulder and fruit lies around the
+                picnic basket.
+            </p>
+
+            <!-- The garden is one still picture, made for each screen shape. -->
+            <picture>
+                <source
+                    media="(orientation: portrait) and (max-width: 600px)"
+                    srcset="assets/backgrounds/phone.webp">
+                <source media="(orientation: portrait)" srcset="assets/backgrounds/tall.webp">
+                <source
+                    media="(orientation: landscape) and (max-height: 500px)"
+                    srcset="assets/backgrounds/short.webp">
+                <img class="gardenPicture" src="assets/backgrounds/wide.webp" alt="">
+            </picture>
+
+            <!-- Each object keeps the same ID in every garden. -->
+            <ul class="objectLayer" aria-label="Garden objects">
+                <!-- Gardening tools rest at the foot of the shade tree. -->
+                <li id="garden-rake" class="gardenObject" data-category="gardening-tool">
+                    <img src="assets/objects/garden-rake.webp"
+                        alt="Rake" width="191" height="437">
+                </li>
+                <li id="flower-pot" class="gardenObject" data-category="gardening-tool">
+                    <img src="assets/objects/flower-pot.webp"
+                        alt="Flowerpot" width="211" height="249">
+                </li>
+                <li id="hand-trowel" class="gardenObject" data-category="gardening-tool">
+                    <img src="assets/objects/hand-trowel.webp"
+                        alt="Trowel" width="335" height="168">
+                </li>
+                <li id="watering-can" class="gardenObject" data-category="gardening-tool">
+                    <img src="assets/objects/watering-can.webp"
+                        alt="Watering can" width="368" height="276">
+                </li>
+
+                <!-- Animals stay near the tree, the bush and the boulder. -->
+                <li id="garden-bird" class="gardenObject" data-category="animal">
+                    <img src="assets/objects/garden-bird.webp"
+                        alt="Bird" width="256" height="214">
+                </li>
+                <li id="garden-butterfly" class="gardenObject" data-category="animal">
+                    <img src="assets/objects/butterfly.webp"
+                        alt="Butterfly" width="239" height="200">
+                </li>
+                <li id="garden-snail" class="gardenObject" data-category="animal">
+                    <img src="assets/objects/garden-snail.webp"
+                        alt="Snail" width="321" height="230">
+                </li>
+
+                <!-- Fruits lie on the picnic blanket around the basket. -->
+                <li id="green-pear" class="gardenObject" data-category="fruit">
+                    <img src="assets/objects/green-pear.webp"
+                        alt="Pear" width="179" height="239">
+                </li>
+                <li id="red-apple" class="gardenObject" data-category="fruit">
+                    <img src="assets/objects/red-apple.webp"
+                        alt="Apple" width="211" height="228">
+                </li>
+                <li id="strawberry" class="gardenObject" data-category="fruit">
+                    <img src="assets/objects/strawberry.webp"
+                        alt="Strawberry" width="167" height="195">
+                </li>
+            </ul>
+        </section>
+    </main>
+</body>
+
+</html>

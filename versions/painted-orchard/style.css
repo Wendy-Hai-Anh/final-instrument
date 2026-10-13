@@ -1,0 +1,170 @@
+/*
+This stylesheet sets up the painted orchard on top of base.css: where each object starts on
+every screen shape.
+*/
+
+/* Painted orchard scene */
+
+.gardenScene {
+    background-color: #f9c46b;
+}
+
+/* Landscape starting places */
+
+/* The rake leans against the orchard tree's trunk. */
+#garden-rake {
+    --x: 29%;
+    --y: 70%;
+    --w: 6%;
+    rotate: -8deg;
+}
+
+#flower-pot {
+    --x: 74%;
+    --y: 80%;
+    --w: 6.6%;
+}
+
+#hand-trowel {
+    --x: 54%;
+    --y: 81%;
+    --w: 10%;
+    rotate: -6deg;
+}
+
+#watering-can {
+    --x: 54%;
+    --y: 95%;
+    --w: 11.5%;
+}
+
+/* The bird starts near the tip of the tree's long right branch. */
+#garden-bird {
+    --x: 32.8%;
+    --y: 31.7%;
+    --w: 8%;
+}
+
+#garden-butterfly {
+    --x: 78%;
+    --y: 42%;
+    --w: 7.5%;
+    rotate: 8deg;
+}
+
+/* The snail starts on the flat top of the mossy stone. */
+#garden-snail {
+    --x: 66%;
+    --y: 87.4%;
+    --w: 10%;
+}
+
+/* The fruit starts beside the basket under the tree. */
+#green-pear {
+    --x: 3.5%;
+    --y: 93%;
+    --w: 5.6%;
+}
+
+#red-apple {
+    --x: 19%;
+    --y: 93%;
+    --w: 6.6%;
+}
+
+#strawberry {
+    --x: 25.5%;
+    --y: 96%;
+    --w: 5.2%;
+}
+
+/* Short landscape screens */
+
+@media (orientation: landscape) and (max-height: 500px) {
+    /*
+    On the wider picture the tree and stone reach higher, so the bird and snail start higher to
+    stay on them.
+    */
+    #garden-bird {
+        --y: 24.1%;
+    }
+
+    #garden-snail {
+        --y: 86.3%;
+    }
+}
+
+/* Portrait screens */
+
+@media (orientation: portrait) {
+    #garden-rake {
+        --x: 42%;
+        --y: 58%;
+        --w: 9.5%;
+    }
+
+    #flower-pot {
+        --x: 84%;
+        --y: 82%;
+        --w: 12%;
+    }
+
+    #hand-trowel {
+        --x: 56%;
+        --y: 80%;
+        --w: 17%;
+    }
+
+    #watering-can {
+        --x: 64%;
+        --w: 19%;
+    }
+
+    #garden-bird {
+        --x: 45.4%;
+        --y: 30.1%;
+        --w: 13%;
+    }
+
+    #garden-butterfly {
+        --x: 66%;
+        --y: 30%;
+        --w: 13%;
+    }
+
+    #garden-snail {
+        --x: 12%;
+        --y: 65.8%;
+        --w: 17%;
+    }
+
+    #green-pear {
+        --x: 5.5%;
+        --w: 8.5%;
+    }
+
+    #red-apple {
+        --x: 34%;
+        --w: 10.5%;
+    }
+
+    #strawberry {
+        --x: 44%;
+        --y: 97%;
+        --w: 8%;
+    }
+}
+
+@media (orientation: portrait) and (max-width: 600px) {
+    /*
+    On the narrower phone picture the tree and stone are shorter, so the bird and snail start
+    lower to stay on them.
+    */
+    #garden-bird {
+        --y: 39.4%;
+    }
+
+    #garden-snail {
+        --y: 67.2%;
+    }
+}
