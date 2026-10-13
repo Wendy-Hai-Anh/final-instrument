@@ -1,6 +1,7 @@
 /*
-This stylesheet sets up the painted orchard on top of base.css: where the sky and the ground
-begin in its picture, and where each object starts on every screen shape.
+This stylesheet sets up the painted orchard on top of base.css: its glow colour, where
+the sky and the ground begin in its picture, and where each object starts on every
+screen shape.
 */
 
 /* Painted orchard scene */
@@ -12,6 +13,7 @@ seedling rows, so the three pitch zones follow what a child can see in the pictu
 .gardenScene {
     --skyLine: 46%;
     --groundLine: 78%;
+    --glowColour: #ff9d2e;
     background-color: #f9c46b;
 }
 
