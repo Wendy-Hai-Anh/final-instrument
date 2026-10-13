@@ -1,6 +1,7 @@
 /*
-This stylesheet sets up the lakeside picnic on top of base.css: where the sky and the ground
-begin in its picture, and where each object starts on every screen shape.
+This stylesheet sets up the lakeside picnic on top of base.css: its glow colour, where
+the sky and the ground begin in its picture, and where each object starts on every
+screen shape.
 */
 
 /* Lakeside scene */
@@ -12,6 +13,7 @@ the three pitch zones follow what a child can see in the picture.
 .gardenScene {
     --skyLine: 40%;
     --groundLine: 72%;
+    --glowColour: #ff5fa8;
     background-color: #f6bcd3;
 }
 
