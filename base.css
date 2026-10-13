@@ -108,20 +108,70 @@ A fixed ratio means a percentage position always lands on the same patch of the 
 
 /*
 Every object is placed by its base point: --x and --y mark where it touches the ground, and --w
-sets its width as a share of the scene. Height follows the picture's own proportions.
+sets its width as a share of the scene. Dragging changes --x and --y, so the object always
+stands on the spot where it was put down.
 */
 .gardenObject {
     position: absolute;
     left: var(--x);
     top: var(--y);
+    z-index: var(--depth, auto);
     width: calc(var(--w) * var(--objectScale));
     translate: -50% -100%;
 }
 
-.gardenObject img {
+/*
+The whole picture is the button. touch-action stops the page from scrolling while a child drags,
+and the invisible margin gives small fingers a larger target than the drawing itself.
+*/
+.objectButton {
+    position: relative;
+    isolation: isolate;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 1rem;
+    background: none;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.objectButton::before {
+    position: absolute;
+    inset: -0.75rem;
+    content: "";
+}
+
+.objectButton:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 0.35rem;
+}
+
+.objectImage {
     display: block;
     width: 100%;
     height: auto;
+    transform-origin: 50% 100%;
+    pointer-events: none;
+    -webkit-user-drag: none;
+}
+
+/* A lifted object grows slightly and casts a shadow so the child can see it is being carried. */
+.gardenObject.isDragging {
+    z-index: 200;
+}
+
+.isDragging .objectButton {
+    scale: 1.08;
+    cursor: grabbing;
+}
+
+.isDragging .objectImage {
+    filter: drop-shadow(0 0.6rem 0.35rem rgb(38 56 50 / 28%));
 }
 
 /* Portrait screens */
