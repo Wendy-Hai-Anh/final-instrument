@@ -104,6 +104,7 @@ original picture. Each window shape loads a picture made for that shape.
     display: block;
     width: calc((1 + 2 * var(--extendX)) * 100%);
     height: calc((1 + var(--extendY)) * 100%);
+    pointer-events: none;
     user-select: none;
 }
 

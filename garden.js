@@ -8,6 +8,7 @@ a drop sends a ripple across the ground.
 */
 
 /* Page elements and settings ------------------------------------------------ */
+const gardenStage = document.querySelector(".gardenStage");
 const gardenScene = document.querySelector(".gardenScene");
 const rippleLayer = document.querySelector(".rippleLayer");
 const soundStatus = document.querySelector("#sound-status");
@@ -151,26 +152,38 @@ function clamp(value, minimum, maximum) {
 }
 
 // Positions are shares of the scene, so an object stays on the same patch at any screen size.
+// The scene's exact size is used, since a rounded size would let places creep on every resize.
 function readPosition(gardenObject) {
     const style = getComputedStyle(gardenObject.item);
+    const scene = gardenScene.getBoundingClientRect();
 
     return {
-        x: parseFloat(style.left) / gardenScene.clientWidth * 100,
-        y: parseFloat(style.top) / gardenScene.clientHeight * 100
+        x: parseFloat(style.left) / scene.width * 100,
+        y: parseFloat(style.top) / scene.height * 100
     };
 }
 
 function readHeight(gardenObject) {
-    return gardenObject.item.offsetHeight / gardenScene.clientHeight * 100;
+    return gardenObject.item.offsetHeight / gardenScene.getBoundingClientRect().height * 100;
 }
 
 function placeObject(gardenObject, x, y) {
-    const halfWidth = gardenObject.item.offsetWidth / gardenScene.clientWidth * 50;
-    const height = readHeight(gardenObject);
+    const scene = gardenScene.getBoundingClientRect();
+    const screen = gardenStage.getBoundingClientRect();
+    const bounds = gardenObject.item.getBoundingClientRect();
 
-    // The whole object stays inside the garden, however far a finger travels.
-    gardenObject.item.style.setProperty("--x", `${clamp(x, halfWidth, 100 - halfWidth)}%`);
-    gardenObject.item.style.setProperty("--y", `${clamp(y, height, 100)}%`);
+    // The garden continues past the scene to the window's edges, so an object can go anywhere on
+    // screen. Its whole box, turned if it leans, stays in view however far a finger travels.
+    const halfWidth = bounds.width / scene.width * 50;
+    const halfHeight = bounds.height / scene.height * 50;
+    const baseBelowCentre = readHeight(gardenObject) / 2;
+    const left = (screen.left - scene.left) / scene.width * 100 + halfWidth;
+    const right = (screen.right - scene.left) / scene.width * 100 - halfWidth;
+    const top = (screen.top - scene.top) / scene.height * 100 + baseBelowCentre + halfHeight;
+    const bottom = (screen.bottom - scene.top) / scene.height * 100 + baseBelowCentre - halfHeight;
+
+    gardenObject.item.style.setProperty("--x", `${clamp(x, left, right)}%`);
+    gardenObject.item.style.setProperty("--y", `${clamp(y, top, bottom)}%`);
 }
 
 function readLine(name) {
@@ -558,7 +571,7 @@ gardenObjects.forEach(gardenObject => {
 // A new screen shape can move the zone lines, so every object's place is read again.
 window.addEventListener("resize", () => {
     gardenObjects.forEach(gardenObject => {
-        // Moved objects are kept inside the garden; the others use the new shape's start places.
+        // Moved objects are kept on screen; the others use the new shape's start places.
         if (gardenObject.item.style.getPropertyValue("--x")) {
             const { x, y } = readPosition(gardenObject);
             placeObject(gardenObject, x, y);
