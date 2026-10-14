@@ -18,8 +18,9 @@
     is its own picture, so a child can tap the objects to play them and drag them anywhere.
     -->
 
-    <header class="pageHeader">
-        <h1 class="projectTitle">Garden of Sounds</h1>
+    <!-- The title stays for screen readers, while the garden itself fills the window. -->
+    <header class="visuallyHidden">
+        <h1>Garden of Sounds</h1>
     </header>
 
     <main class="gardenStage">
@@ -46,15 +47,10 @@
                 faster.
             </p>
 
-            <!-- The garden is one still picture, made for each screen shape. -->
+            <!-- The garden is one still picture, made for each window shape. -->
             <picture>
-                <source
-                    media="(orientation: portrait) and (max-width: 600px)"
-                    srcset="assets/backgrounds/phone.webp">
-                <source media="(orientation: portrait)" srcset="assets/backgrounds/tall.webp">
-                <source
-                    media="(orientation: landscape) and (max-height: 500px)"
-                    srcset="assets/backgrounds/short.webp">
+                <source media="(max-aspect-ratio: 3/5)" srcset="assets/backgrounds/phone.webp">
+                <source media="(max-aspect-ratio: 11/10)" srcset="assets/backgrounds/tall.webp">
                 <img class="gardenPicture" src="assets/backgrounds/wide.webp" alt="">
             </picture>
 

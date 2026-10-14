@@ -84,29 +84,9 @@ the three pitch zones follow what a child can see in the picture.
     --w: 5.2%;
 }
 
-/* Short landscape screens */
+/* Square and portrait windows */
 
-@media (orientation: landscape) and (max-height: 500px) {
-    /*
-    On the wider picture the log sits higher, so the objects resting on it start higher to stay
-    on them.
-    */
-    #flower-pot {
-        --y: 65.9%;
-    }
-
-    #garden-bird {
-        --y: 65.9%;
-    }
-
-    #garden-snail {
-        --y: 65.9%;
-    }
-}
-
-/* Portrait screens */
-
-@media (orientation: portrait) {
+@media (max-aspect-ratio: 11/10) {
     .gardenScene {
         --skyLine: 47%;
         --groundLine: 72%;
@@ -174,7 +154,7 @@ the three pitch zones follow what a child can see in the picture.
     }
 }
 
-@media (orientation: portrait) and (max-width: 600px) {
+@media (max-aspect-ratio: 3/5) {
     /*
     On the narrower phone picture the log is thinner, so the objects resting on it start lower
     to stay on them.

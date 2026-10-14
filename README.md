@@ -4,7 +4,8 @@ Garden of Sounds is a browser-based musical toy for toddlers. Children tap and d
 tools, animals and fruits around an illustrated storybook garden to build layered music.
 
 This repository holds the final instrument for Assignment 3. There are three versions of the
-garden. Each one is a still picture with ten separate objects on it that can be moved and played.
+garden. Each one is a still picture with ten separate objects on it that can be moved and played,
+and it fills the whole browser window.
 
 ## Structure
 
@@ -17,8 +18,9 @@ garden. Each one is a still picture with ten separate objects on it that can be 
   - `index.html` lists the objects and sets the garden's musical key and tempo.
   - `style.css` sets the glow colour, the pitch zone lines and where each object starts on every
     screen shape.
-  - `assets/backgrounds/` holds the garden picture in four shapes: wide, short (landscape
-    phones), tall (portrait tablets) and phone.
+  - `assets/backgrounds/` holds the garden picture in three shapes: wide, tall (square and
+    portrait windows) and phone. Each one keeps the original picture in the middle and continues
+    the garden past its sides and into the sky, so it can fill windows of different shapes.
   - `assets/objects/` holds one picture for each object.
 
 ## Garden versions

@@ -86,25 +86,9 @@ seedling rows, so the three pitch zones follow what a child can see in the pictu
     --w: 5.2%;
 }
 
-/* Short landscape screens */
+/* Square and portrait windows */
 
-@media (orientation: landscape) and (max-height: 500px) {
-    /*
-    On the wider picture the tree and stone reach higher, so the bird and snail start higher to
-    stay on them.
-    */
-    #garden-bird {
-        --y: 24.1%;
-    }
-
-    #garden-snail {
-        --y: 86.3%;
-    }
-}
-
-/* Portrait screens */
-
-@media (orientation: portrait) {
+@media (max-aspect-ratio: 11/10) {
     .gardenScene {
         --skyLine: 37%;
         --groundLine: 74%;
@@ -168,7 +152,7 @@ seedling rows, so the three pitch zones follow what a child can see in the pictu
     }
 }
 
-@media (orientation: portrait) and (max-width: 600px) {
+@media (max-aspect-ratio: 3/5) {
     /*
     On the narrower phone picture the tree and stone are shorter, so the bird and snail start
     lower to stay on them.
