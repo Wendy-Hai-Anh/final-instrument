@@ -65,8 +65,69 @@ focus, so the buttons keep their drawn look.
 }
 
 a:hover .buttonHover,
-a:focus-visible .buttonHover {
+a:focus-visible .buttonHover,
+a[aria-current="page"] .buttonHover {
     opacity: 1;
+}
+
+/* Storybook buttons */
+
+/*
+The home button and chapter dots float in the top corner of every garden, above the objects so
+they can always be reached. The current garden's dot is gold.
+*/
+.storyNav {
+    --buttonSize: clamp(2.75rem, 8vmin, 4rem);
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.homeButton {
+    position: relative;
+    display: block;
+    width: var(--buttonSize);
+    border-radius: 25%;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.chapterRow {
+    position: relative;
+    display: flex;
+    gap: calc(var(--buttonSize) * 0.25);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+/* The path runs behind the dots, from the middle of the first to the middle of the last. */
+.chapterRow::before {
+    position: absolute;
+    top: 50%;
+    right: calc(var(--buttonSize) * 0.4);
+    left: calc(var(--buttonSize) * 0.4);
+    height: calc(var(--buttonSize) * 0.2);
+    background: url("assets/buttons/path-across.webp") center / 100% 100%;
+    translate: 0 -50%;
+    content: "";
+}
+
+.chapterButton {
+    position: relative;
+    display: block;
+    width: calc(var(--buttonSize) * 0.8);
+    border-radius: 50%;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.homeButton:focus-visible,
+.chapterButton:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 0.2rem;
 }
 
 /* Garden stage */

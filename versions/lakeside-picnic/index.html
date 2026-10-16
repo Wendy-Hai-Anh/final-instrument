@@ -18,9 +18,47 @@
     can tap the objects to play them and drag them anywhere in the garden.
     -->
 
-    <!-- The title stays for screen readers, while the garden itself fills the window. -->
-    <header class="visuallyHidden">
-        <h1>Garden of Sounds</h1>
+    <!--
+    The title stays for screen readers, while the garden itself fills the window. The home button
+    and chapter dots lead back to the storybook cover and on to the other gardens.
+    -->
+    <header>
+        <h1 class="visuallyHidden">Garden of Sounds</h1>
+        <nav class="storyNav" aria-label="Storybook">
+            <a class="homeButton" href="../../index.html">
+                <img class="buttonImage" src="../../assets/buttons/home.webp"
+                    alt="Back to the storybook" width="280" height="280">
+                <img class="buttonHover" src="../../assets/buttons/home-raised.webp" alt=""
+                    width="280" height="280">
+            </a>
+            <ol class="chapterRow">
+                <li>
+                    <a class="chapterButton" href="../lakeside-picnic/index.html"
+                        aria-current="page">
+                        <img class="buttonImage" src="../../assets/buttons/dot-1.webp"
+                            alt="Lakeside picnic" width="200" height="200">
+                        <img class="buttonHover" src="../../assets/buttons/dot-1-gold.webp"
+                            alt="" width="200" height="200">
+                    </a>
+                </li>
+                <li>
+                    <a class="chapterButton" href="../painted-orchard/index.html">
+                        <img class="buttonImage" src="../../assets/buttons/dot-2.webp"
+                            alt="Painted orchard" width="200" height="200">
+                        <img class="buttonHover" src="../../assets/buttons/dot-2-gold.webp"
+                            alt="" width="200" height="200">
+                    </a>
+                </li>
+                <li>
+                    <a class="chapterButton" href="../flower-meadow/index.html">
+                        <img class="buttonImage" src="../../assets/buttons/dot-3.webp"
+                            alt="Giant flower meadow" width="200" height="200">
+                        <img class="buttonHover" src="../../assets/buttons/dot-3-gold.webp"
+                            alt="" width="200" height="200">
+                    </a>
+                </li>
+            </ol>
+        </nav>
     </header>
 
     <main class="gardenStage">

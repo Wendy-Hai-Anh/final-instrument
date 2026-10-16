@@ -17,9 +17,11 @@ and it fills the whole browser window.
 - `garden.js` holds the sound and interaction that every garden shares.
 - `assets/textures/` holds the paper grain behind the page.
 - `assets/storybook/` holds the cover pictures: the teal backdrop, the closed and open book and
-  the Start sign. `assets/buttons/` holds the numbered chapter dots and the path that joins them.
+  the Start sign. `assets/buttons/` holds the home button, the numbered chapter dots and the
+  path that joins them.
 - `versions/` holds one folder per garden:
-  - `index.html` lists the objects and sets the garden's musical key and tempo.
+  - `index.html` lists the objects and sets the garden's musical key and tempo. Its home button
+    and chapter dots lead back to the storybook cover and on to the other gardens.
   - `style.css` sets the glow colour, the pitch zone lines and where each object starts on every
     screen shape.
   - `assets/backgrounds/` holds the garden picture in three shapes: wide, tall (square and
