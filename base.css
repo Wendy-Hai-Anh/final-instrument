@@ -1,6 +1,7 @@
 /*
-This stylesheet holds the layout and feedback shared by every garden. Each garden adds its glow
-colour, pitch zone lines and object starting places in a second stylesheet.
+This stylesheet holds what the pages share: the colour tokens, the picture buttons, and the
+garden layout and feedback. Each garden adds its glow colour, pitch zone lines and object
+starting places in a second stylesheet.
 */
 
 /* Colour tokens */
@@ -15,8 +16,6 @@ colour, pitch zone lines and object starting places in a second stylesheet.
     --butterYellow: #f7cb5c;
     --coral: #ef7a6d;
     --glowCore: #fffbe8;
-    --headerHeight: 3rem;
-    --stageGap: 1rem;
 }
 
 /* Page */
@@ -34,21 +33,6 @@ body {
     font-family: Georgia, "Times New Roman", serif;
 }
 
-.pageHeader {
-    display: flex;
-    align-items: center;
-    height: var(--headerHeight);
-    padding: 0 var(--stageGap);
-}
-
-/* The title stays small so the garden, not the heading, fills the screen. */
-.projectTitle {
-    margin: 0;
-    font-size: 1.05rem;
-    font-weight: normal;
-    letter-spacing: 0.04em;
-}
-
 .visuallyHidden {
     position: absolute;
     width: 1px;
@@ -56,6 +40,33 @@ body {
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
+}
+
+/* Picture buttons */
+
+/*
+Every storybook button is a picture with a second picture laid over it for hover and keyboard
+focus, so the buttons keep their drawn look.
+*/
+.buttonImage,
+.buttonHover {
+    display: block;
+    width: 100%;
+    height: auto;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.buttonHover {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.15s ease-out;
+}
+
+a:hover .buttonHover,
+a:focus-visible .buttonHover {
+    opacity: 1;
 }
 
 /* Garden stage */
@@ -331,22 +342,5 @@ continues far enough to cover every window shape that uses it.
         --objectScale: 1.25;
         --extendX: 0.1;
         --extendY: 0.2;
-    }
-}
-
-/* Small screens */
-
-/* The page that lists the gardens uses a smaller header and margins on small screens. */
-@media (orientation: portrait) and (max-width: 600px) {
-    :root {
-        --headerHeight: 2.5rem;
-        --stageGap: 0.75rem;
-    }
-}
-
-@media (orientation: landscape) and (max-height: 500px) {
-    :root {
-        --headerHeight: 2.25rem;
-        --stageGap: 0.5rem;
     }
 }

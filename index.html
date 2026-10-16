@@ -7,52 +7,78 @@
     <title>Garden of Sounds</title>
     <link rel="stylesheet" href="base.css">
     <link rel="stylesheet" href="style.css">
+    <script src="storybook.js" defer></script>
 </head>
 
-<body>
+<body class="storybookPage">
     <!--
-    This page links the three garden versions of the final instrument. Each version is a complete
-    scene in its own folder, so one can be chosen as the final garden without changing the others.
+    This page is the cover of a storybook. Starting the story opens the book on the first garden,
+    and each numbered chapter opens one of the three gardens.
     -->
 
-    <header class="pageHeader">
-        <h1 class="projectTitle">Garden of Sounds</h1>
-    </header>
+    <main class="storybookCover">
+        <!-- The closed book carries the title. The open book stays hidden until it opens. -->
+        <h1 class="storybook">
+            <img class="bookOpen" src="assets/storybook/book-open.webp" alt="" width="1740"
+                height="1140">
+            <img class="bookCover" src="assets/storybook/book-closed.webp" alt="Garden of Sounds"
+                width="870" height="1140">
+        </h1>
 
-    <main class="versionPage">
-        <h2 class="versionHeading">Choose a garden</h2>
-        <p class="versionIntro">
+        <nav class="chapterMenu" aria-label="Gardens">
+            <a class="startSign" href="versions/lakeside-picnic/index.html" data-opens-book>
+                <img class="buttonImage" src="assets/storybook/sign-start.webp" alt="Start now"
+                    width="720" height="810">
+                <img class="buttonHover" src="assets/storybook/sign-start-hover.webp" alt=""
+                    width="720" height="810">
+            </a>
+
+            <!-- Each chapter is one garden, joined in order like a path through the book. -->
+            <ol class="chapterList">
+                <li>
+                    <a class="chapterLink" href="versions/lakeside-picnic/index.html"
+                        data-opens-book>
+                        <span class="chapterDot">
+                            <img class="buttonImage" src="assets/buttons/dot-1.webp" alt=""
+                                width="200" height="200">
+                            <img class="buttonHover" src="assets/buttons/dot-1-gold.webp" alt=""
+                                width="200" height="200">
+                        </span>
+                        Lakeside picnic
+                    </a>
+                </li>
+                <li>
+                    <a class="chapterLink" href="versions/painted-orchard/index.html"
+                        data-opens-book>
+                        <span class="chapterDot">
+                            <img class="buttonImage" src="assets/buttons/dot-2.webp" alt=""
+                                width="200" height="200">
+                            <img class="buttonHover" src="assets/buttons/dot-2-gold.webp" alt=""
+                                width="200" height="200">
+                        </span>
+                        Painted orchard
+                    </a>
+                </li>
+                <li>
+                    <a class="chapterLink" href="versions/flower-meadow/index.html"
+                        data-opens-book>
+                        <span class="chapterDot">
+                            <img class="buttonImage" src="assets/buttons/dot-3.webp" alt=""
+                                width="200" height="200">
+                            <img class="buttonHover" src="assets/buttons/dot-3-gold.webp" alt=""
+                                width="200" height="200">
+                        </span>
+                        Giant flower meadow
+                    </a>
+                </li>
+            </ol>
+        </nav>
+
+        <p class="grownUpNote">
             Each garden holds the same ten objects: four gardening tools, three animals and three
-            fruits. Tap an object to start or stop its sound, and drag it to move it. Higher
-            places play higher notes, and places further right repeat faster.
+            fruits. Tap an object to start or stop its sound, and drag it to move it. Higher places
+            play higher notes, and places further right repeat faster.
         </p>
-
-        <ul class="versionList">
-            <li class="versionItem">
-                <a class="versionLink" href="versions/lakeside-picnic/index.html">
-                    Lakeside picnic
-                </a>
-                <p class="versionNote">
-                    Pink: bold ink lines, a blossom tree, a lake and a picnic blanket.
-                </p>
-            </li>
-            <li class="versionItem">
-                <a class="versionLink" href="versions/painted-orchard/index.html">
-                    Painted orchard
-                </a>
-                <p class="versionNote">
-                    Golden orange: a fruit tree, tall foxgloves and rows of seedlings.
-                </p>
-            </li>
-            <li class="versionItem">
-                <a class="versionLink" href="versions/flower-meadow/index.html">
-                    Giant flower meadow
-                </a>
-                <p class="versionNote">
-                    Blue and green: giant flowers, with the snail and bird on a fallen log.
-                </p>
-            </li>
-        </ul>
     </main>
 </body>
 

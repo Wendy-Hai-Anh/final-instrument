@@ -1,54 +1,219 @@
 /*
-This stylesheet lays out the page that links the garden versions. The gardens themselves are
+This stylesheet lays out the storybook cover that opens the gardens. The gardens themselves are
 styled by base.css and each version's own stylesheet.
 */
 
-/* Version page */
+/* Cover page */
 
-.versionPage {
-    max-width: 40rem;
-    padding: 1rem var(--stageGap) 2rem;
-    margin: 0 auto;
+/* The paper grain sits over a painted teal wash, so the cover feels like a printed book. */
+.storybookPage {
+    background-color: #3e8a92;
+    background-image: url("assets/textures/paper-grain.webp"),
+        url("assets/storybook/backdrop.webp");
+    background-position: 0 0, center;
+    background-size: 20rem, cover;
 }
 
-.versionHeading {
-    margin: 1rem 0 0.5rem;
-    font-size: 1.6rem;
-    font-weight: normal;
-}
-
-.versionIntro {
-    margin: 0 0 1.5rem;
-    line-height: 1.5;
-}
-
-.versionList {
+/*
+Portrait windows stack the book above the sign and the chapters, so a child sees the sign
+without scrolling. Landscape windows put them side by side.
+*/
+.storybookCover {
+    --bookWidth: min(62vw, 24rem, 42vh);
+    --signWidth: min(50vw, 13rem);
+    --dotSize: 3.5rem;
+    --chapterText: 1.25rem;
     display: grid;
-    gap: 1rem;
+    grid-template-areas:
+        "book"
+        "menu"
+        "note";
+    justify-items: center;
+    align-content: center;
+    gap: 1.5rem;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 2rem 1rem;
+    transition: opacity 0.4s ease-in, scale 0.4s ease-in;
+}
+
+@media (orientation: landscape) {
+    .storybookCover {
+        --bookWidth: min(54vh, 28rem);
+        --signWidth: min(28vh, 15rem);
+        --dotSize: min(9vh, 4rem);
+        --chapterText: clamp(1rem, 4.6vh, 1.25rem);
+        grid-template-areas:
+            "book menu"
+            "note note";
+        grid-template-columns: auto auto;
+        justify-content: center;
+        align-items: center;
+        column-gap: clamp(2rem, 8vw, 7rem);
+    }
+}
+
+/* Storybook */
+
+/*
+The book turns on its spine, the left edge of the closed cover. The open book is twice as wide
+and centred on that spine, so its right page lies exactly under the closed cover.
+*/
+.storybook {
+    position: relative;
+    z-index: 1;
+    grid-area: book;
+    width: var(--bookWidth);
+    aspect-ratio: 290 / 380;
+    margin: 0;
+    perspective: 1600px;
+    transform-origin: 0 50%;
+    transition: translate 0.9s ease-in-out, scale 0.9s ease-in-out;
+}
+
+.bookCover,
+.bookOpen {
+    position: absolute;
+    top: 0;
+    display: block;
+    height: 100%;
+    user-select: none;
+}
+
+.bookCover {
+    left: 0;
+    width: 100%;
+    transform-origin: 0 50%;
+    backface-visibility: hidden;
+    transition: rotate 0.9s ease-in-out;
+}
+
+/* The left page unfolds from the spine as the cover passes the halfway point. */
+.bookOpen {
+    left: -100%;
+    width: 200%;
+    clip-path: inset(0 0 0 50%);
+    visibility: hidden;
+    transition: clip-path 0.45s ease-out 0.45s;
+}
+
+/* storybook.js sets the move and scale that bring the open book to the middle of the window. */
+.storybook.isOpen {
+    translate: var(--openX) var(--openY);
+    scale: var(--openScale);
+}
+
+.isOpen .bookCover {
+    rotate: y -180deg;
+}
+
+.isOpen .bookOpen {
+    clip-path: inset(0);
+    visibility: visible;
+}
+
+/* The sign and the chapters step back while the book opens, then the whole page fades out. */
+.isOpening .chapterMenu,
+.isOpening .grownUpNote {
+    opacity: 0;
+}
+
+.isLeaving .storybookCover {
+    opacity: 0;
+    scale: 1.06;
+}
+
+/* Sign and chapters */
+
+.chapterMenu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    grid-area: menu;
+    transition: opacity 0.3s ease-out;
+}
+
+/* Each button is two pictures: the plain one, and the hover one laid on top of it. */
+.startSign {
+    position: relative;
+    display: block;
+    width: var(--signWidth);
+    border-radius: 0.5rem;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.startSign:active {
+    scale: 0.97;
+}
+
+.startSign:focus-visible,
+.chapterLink:focus-visible {
+    outline: 3px solid var(--cream);
+    outline-offset: 0.3rem;
+}
+
+.chapterList {
+    position: relative;
+    display: grid;
+    gap: calc(var(--dotSize) * 0.4);
     padding: 0;
     margin: 0;
     list-style: none;
 }
 
-/* Each garden sits on a soft card so the three choices are easy to tell apart. */
-.versionItem {
-    padding: 1rem 1.25rem;
-    border-radius: 1.2rem 1.6rem 1.4rem 1.5rem;
-    background-color: rgb(255 255 255 / 60%);
-    box-shadow: 0 0.2rem 0 rgb(38 56 50 / 12%);
+/* The path runs behind the dots, from the middle of the first to the middle of the last. */
+.chapterList::before {
+    position: absolute;
+    top: calc(var(--dotSize) / 2);
+    bottom: calc(var(--dotSize) / 2);
+    left: calc(var(--dotSize) / 2);
+    width: calc(var(--dotSize) * 0.24);
+    background: url("assets/buttons/path-down.webp") center / 100% 100%;
+    translate: -50% 0;
+    content: "";
 }
 
-.versionLink {
-    color: var(--deepLeaf);
-    font-size: 1.25rem;
+.chapterLink {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-radius: calc(var(--dotSize) / 2);
+    padding-right: 0.5rem;
+    color: var(--cream);
+    font-size: var(--chapterText);
+    font-weight: bold;
+    text-decoration: none;
+    text-shadow: 0 0.1rem 0.25rem rgb(20 60 66 / 70%);
+    -webkit-tap-highlight-color: transparent;
 }
 
-.versionLink:hover,
-.versionLink:focus-visible {
-    color: var(--coral);
+.chapterDot {
+    position: relative;
+    flex: none;
+    width: var(--dotSize);
 }
 
-.versionNote {
-    margin: 0.4rem 0 0;
+/* Grown-up note */
+
+/* The note for grown-ups sits on a paper card so the dark text stays easy to read. */
+.grownUpNote {
+    grid-area: note;
+    max-width: 36rem;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border-radius: 0.8rem;
+    background-color: rgb(253 240 216 / 92%);
     line-height: 1.5;
+    transition: opacity 0.3s ease-out;
+}
+
+/* Reduced motion goes straight to the garden, so the book never turns. */
+@media (prefers-reduced-motion: reduce) {
+    .storybook,
+    .bookCover,
+    .bookOpen,
+    .storybookCover {
+        transition: none;
+    }
 }
