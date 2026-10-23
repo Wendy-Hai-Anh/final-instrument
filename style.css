@@ -162,7 +162,7 @@ and centred on that spine, so its right page lies exactly under the closed cover
     list-style: none;
 }
 
-/* The path runs behind the dots, from the middle of the first to the middle of the last. */
+/* The path runs behind the previews, from the middle of the first to the middle of the last. */
 .chapterList::before {
     position: absolute;
     top: calc(var(--dotSize) / 2);
@@ -192,6 +192,25 @@ and centred on that spine, so its right page lies exactly under the closed cover
     position: relative;
     flex: none;
     width: var(--dotSize);
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 0.25rem solid #a52a43;
+    border-radius: 50%;
+    background-color: #a52a43;
+    box-shadow:
+        inset 0.14rem 0.14rem 0 rgb(255 255 255 / 28%),
+        inset -0.14rem -0.14rem 0 rgb(95 20 38 / 30%),
+        0 0.14rem 0 #762038;
+    transition: border-color 0.15s ease-out, scale 0.15s ease-out;
+}
+
+.chapterLink:hover .chapterDot,
+.chapterLink:focus-visible .chapterDot {
+    border-color: #e5aa33;
+}
+
+.chapterLink:active .chapterDot {
+    scale: 0.94;
 }
 
 /* Grown-up note */
