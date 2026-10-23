@@ -53,6 +53,8 @@ The mapping and feedback come from peer testing of the eight Assignment 2 protot
   with the object.
 - **The kind of object picks the sound family.** Gardening tools are soft drums, animals sing
   the melody and fruits are slow ambient textures.
+- **Resting objects breathe.** Each one swells a little every few seconds, so a child can see
+  what can be touched without any words. Playing objects stop, since every note moves them.
 - **Tap to start or stop.** Every tap plays a note and makes the object glow along its outline,
   adapted from Prototype 5.
 - **Every note moves the object,** adapted from Prototype 8. Tools sway, animals hop and fruits

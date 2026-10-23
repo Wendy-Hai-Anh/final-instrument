@@ -240,6 +240,13 @@ and the invisible margin gives small fingers a larger target than the drawing it
     content: "";
 }
 
+/* Fingers are less precise than a mouse, so touch screens get a wider invisible margin. */
+@media (pointer: coarse) {
+    .objectButton::before {
+        inset: -1.25rem;
+    }
+}
+
 .objectButton:focus-visible {
     outline: 3px solid var(--ink);
     outline-offset: 0.35rem;
@@ -252,6 +259,40 @@ and the invisible margin gives small fingers a larger target than the drawing it
     transform-origin: 50% 100%;
     pointer-events: none;
     -webkit-user-drag: none;
+}
+
+/*
+A resting object breathes gently so a child can see it is alive and can be touched, without any
+words. Each object starts at a different moment, so the garden never pulses all at once. Playing
+objects stop breathing, since every note already moves them.
+*/
+.gardenObject {
+    transform-origin: 50% 100%;
+    animation: object-breathe 3.2s ease-in-out infinite;
+}
+
+.gardenObject:nth-child(3n + 1) {
+    animation-delay: -1.1s;
+}
+
+.gardenObject:nth-child(3n + 2) {
+    animation-delay: -2.2s;
+}
+
+.gardenObject:has([aria-pressed="true"]),
+.gardenObject.isDragging {
+    animation: none;
+}
+
+@keyframes object-breathe {
+    0%,
+    100% {
+        scale: 1;
+    }
+
+    50% {
+        scale: 1.035;
+    }
 }
 
 /* A lifted object grows slightly and casts a shadow so the child can see it is being carried. */
@@ -361,8 +402,9 @@ so one small ring now spreads flat across the ground only where an object is put
     }
 }
 
-/* Reduced motion keeps every response but removes the growing waves. */
+/* Reduced motion keeps every response but removes the growing waves and the resting breath. */
 @media (prefers-reduced-motion: reduce) {
+    .gardenObject,
     .gardenObject.isGlowing .objectButton::after {
         animation: none;
     }
