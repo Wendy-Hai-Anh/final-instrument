@@ -5,79 +5,122 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Garden of Sounds</title>
-    <link rel="stylesheet" href="base.css">
-    <link rel="stylesheet" href="style.css">
-    <script src="storybook.js" defer></script>
+    <link rel="stylesheet" href="base.css?v=picture-book-20261024">
+    <link rel="stylesheet" href="style.css?v=picture-book-20261024">
+    <script src="storybook.js?v=picture-book-20261024" defer></script>
 </head>
 
 <body class="storybookPage">
     <!--
-    This page is the cover of a storybook. Starting the story opens the book on the first garden,
-    and each numbered chapter opens one of the three gardens.
+    This page is a storybook. A child taps the cover to open it, turns the pages with the big arrows
+    or a swipe, and taps a garden to step into it. The cross closes the book again. Every page is a
+    picture, so the book can be read without words.
     -->
 
-    <main class="storybookCover">
-        <!-- The closed book carries the title. The open book stays hidden until it opens. -->
-        <h1 class="storybook">
-            <img class="bookOpen" src="assets/storybook/book-open.webp" alt="" width="1740"
-                height="1140">
-            <img class="bookCover" src="assets/storybook/book-closed.webp" alt="Garden of Sounds"
-                width="870" height="1140">
-        </h1>
+    <main class="storybookStage">
+        <h1 class="visuallyHidden">Garden of Sounds</h1>
+        <p id="book-status" class="visuallyHidden" role="status"></p>
 
-        <nav class="chapterMenu" aria-label="Gardens">
-            <a class="startSign" href="versions/lakeside-picnic/index.html" data-opens-book>
-                <img class="buttonImage" src="assets/storybook/sign-start.webp" alt="Start now"
-                    width="720" height="810">
-                <img class="buttonHover" src="assets/storybook/sign-start-hover.webp" alt=""
-                    width="720" height="810">
+        <button class="bookButton backButton" type="button" data-turn="back">
+            <img class="buttonImage" src="assets/buttons/back.webp" alt="Turn back a page"
+                width="280" height="280">
+            <img class="buttonHover" src="assets/buttons/back-raised.webp" alt="" width="280"
+                height="280">
+        </button>
+
+        <!--
+        The book is built like a real one. Each leaf has a front and a back, and turning a leaf
+        rotates it over the spine. The cover is the first leaf; the last right page lies flat.
+        -->
+        <div class="book" data-spread="0">
+            <img class="bookBack" src="assets/storybook/book-back.webp" alt="" width="870"
+                height="1140">
+
+            <a class="bookPage stillPage gardenPage" href="versions/flower-meadow/index.html"
+                data-garden="flower-meadow">
+                <img class="pageImage" src="assets/storybook/page-flower-meadow-play.webp"
+                    alt="Play in the giant flower meadow" width="798" height="952">
+                <img class="playButton" src="assets/buttons/play.webp" alt="" width="240"
+                    height="240">
             </a>
 
-            <!-- Each chapter is one garden, joined in order like a path through the book. -->
-            <ol class="chapterList">
-                <li>
-                    <a class="chapterLink" href="versions/lakeside-picnic/index.html"
-                        data-opens-book>
-                        <span class="chapterDot">
-                            <img class="buttonImage" src="assets/buttons/garden-1.webp" alt=""
-                                width="200" height="200">
-                            <img class="buttonHover" src="assets/buttons/garden-1-gold.webp" alt=""
-                                width="200" height="200">
-                        </span>
-                        Lakeside picnic
-                    </a>
-                </li>
-                <li>
-                    <a class="chapterLink" href="versions/painted-orchard/index.html"
-                        data-opens-book>
-                        <span class="chapterDot">
-                            <img class="buttonImage" src="assets/buttons/garden-2.webp" alt=""
-                                width="200" height="200">
-                            <img class="buttonHover" src="assets/buttons/garden-2-gold.webp" alt=""
-                                width="200" height="200">
-                        </span>
-                        Painted orchard
-                    </a>
-                </li>
-                <li>
-                    <a class="chapterLink" href="versions/flower-meadow/index.html"
-                        data-opens-book>
-                        <span class="chapterDot">
-                            <img class="buttonImage" src="assets/buttons/garden-3.webp" alt=""
-                                width="200" height="200">
-                            <img class="buttonHover" src="assets/buttons/garden-3-gold.webp" alt=""
-                                width="200" height="200">
-                        </span>
-                        Giant flower meadow
-                    </a>
-                </li>
-            </ol>
-        </nav>
+            <div class="leaf coverLeaf">
+                <button class="leafFace leafFront" type="button" data-turn="next">
+                    <img class="pageImage" src="assets/storybook/book-closed.webp"
+                        alt="Garden of Sounds. Open the book" width="870" height="1140">
+                </button>
+                <div class="leafFace leafBack">
+                    <img class="pageImage" src="assets/storybook/cover-inside.webp"
+                        alt="Once upon a time, in a garden full of sounds" width="870"
+                        height="1140">
+                </div>
+            </div>
+
+            <div class="leaf">
+                <button class="leafFace leafFront bookPage" type="button" data-turn="next">
+                    <img class="pageImage" src="assets/storybook/page-title.webp"
+                        alt="A flower on a hill. Turn the page" width="798" height="952">
+                </button>
+                <a class="leafFace leafBack bookPage gardenPage"
+                    href="versions/lakeside-picnic/index.html" data-garden="lakeside-picnic">
+                    <img class="pageImage" src="assets/storybook/page-lakeside-picnic-picture.webp"
+                        alt="Lakeside picnic" width="798" height="952">
+                </a>
+            </div>
+
+            <div class="leaf">
+                <a class="leafFace leafFront bookPage gardenPage"
+                    href="versions/lakeside-picnic/index.html" data-garden="lakeside-picnic">
+                    <img class="pageImage" src="assets/storybook/page-lakeside-picnic-play.webp"
+                        alt="Play in the lakeside picnic" width="798" height="952">
+                    <img class="playButton" src="assets/buttons/play.webp" alt="" width="240"
+                        height="240">
+                </a>
+                <a class="leafFace leafBack bookPage gardenPage"
+                    href="versions/painted-orchard/index.html" data-garden="painted-orchard">
+                    <img class="pageImage" src="assets/storybook/page-painted-orchard-picture.webp"
+                        alt="Painted orchard" width="798" height="952">
+                </a>
+            </div>
+
+            <div class="leaf">
+                <a class="leafFace leafFront bookPage gardenPage"
+                    href="versions/painted-orchard/index.html" data-garden="painted-orchard">
+                    <img class="pageImage" src="assets/storybook/page-painted-orchard-play.webp"
+                        alt="Play in the painted orchard" width="798" height="952">
+                    <img class="playButton" src="assets/buttons/play.webp" alt="" width="240"
+                        height="240">
+                </a>
+                <a class="leafFace leafBack bookPage gardenPage"
+                    href="versions/flower-meadow/index.html" data-garden="flower-meadow">
+                    <img class="pageImage" src="assets/storybook/page-flower-meadow-picture.webp"
+                        alt="Giant flower meadow" width="798" height="952">
+                </a>
+            </div>
+
+            <!-- The rings stay on top while the pages turn around them. -->
+            <img class="spineRings" src="assets/storybook/spine-rings.webp" alt="" width="140"
+                height="952">
+        </div>
+
+        <button class="bookButton nextButton" type="button" data-turn="next">
+            <img class="buttonImage" src="assets/buttons/next.webp" alt="Turn the page"
+                width="280" height="280">
+            <img class="buttonHover" src="assets/buttons/next-raised.webp" alt="" width="280"
+                height="280">
+        </button>
+
+        <button class="bookButton closeButton" type="button" data-turn="close">
+            <img class="buttonImage" src="assets/buttons/close.webp" alt="Close the book"
+                width="280" height="280">
+            <img class="buttonHover" src="assets/buttons/close-raised.webp" alt="" width="280"
+                height="280">
+        </button>
 
         <p class="grownUpNote">
-            Each garden holds the same ten objects: four gardening tools, three animals and three
-            fruits. Tap an object to start or stop its sound, and drag it to move it. Higher places
-            play higher notes, and places further right repeat faster.
+            For grown-ups: tap the book to open it, then turn the pages with the arrows or a swipe.
+            Tap a garden to step inside. In each garden, tap an object to start or stop its sound
+            and drag it to move it.
         </p>
     </main>
 </body>

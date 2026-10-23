@@ -66,7 +66,9 @@ focus, so the buttons keep their drawn look.
 
 a:hover .buttonHover,
 a:focus-visible .buttonHover,
-a[aria-current="page"] .buttonHover {
+a[aria-current="page"] .buttonHover,
+button:hover .buttonHover,
+button:focus-visible .buttonHover {
     opacity: 1;
 }
 
