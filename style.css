@@ -21,7 +21,7 @@ without scrolling. Landscape windows put them side by side.
 .storybookCover {
     --bookWidth: min(62vw, 24rem, 42vh);
     --signWidth: min(50vw, 13rem);
-    --dotSize: 3.5rem;
+    --dotSize: 4.5rem;
     --chapterText: 1.25rem;
     display: grid;
     grid-template-areas:

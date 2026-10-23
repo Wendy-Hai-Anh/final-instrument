@@ -9,7 +9,7 @@ and it fills the whole browser window.
 
 ## Structure
 
-- `index.html` is a storybook cover. Its Start sign opens the first garden and its scene-preview
+- `index.html` is a storybook cover. Its Start sign opens the first garden and its numbered
   chapters open each garden. `style.css` lays out the cover, and `storybook.js` turns the book
   open before a garden loads.
 - `base.css` holds the colour tokens and picture buttons that every page shares, and the
@@ -17,11 +17,11 @@ and it fills the whole browser window.
 - `garden.js` holds the sound and interaction that every garden shares.
 - `assets/textures/` holds the paper grain behind the page.
 - `assets/storybook/` holds the cover pictures: the teal backdrop, the closed and open book and
-  the Start sign. `assets/buttons/` holds the home button and the path that joins the garden
-  preview buttons.
+  the Start sign. `assets/buttons/` holds the home button, the round chapter buttons (each a
+  small picture of its garden, with a gold rim for the current one) and the path that joins them.
 - `versions/` holds one folder per garden:
   - `index.html` lists the objects and sets the garden's musical key and tempo. Its home button
-    and garden preview buttons lead back to the storybook cover and on to the other gardens.
+    and chapter buttons lead back to the storybook cover and on to the other gardens.
   - `style.css` sets the glow colour, the pitch zone lines and where each object starts on every
     screen shape.
   - `assets/backgrounds/` holds the garden picture in three shapes: wide, tall (square and
@@ -73,9 +73,10 @@ Prototype 2's continuous pitch and Prototype 7's continuous spinning are not use
   Prototypes 1 and 3, and the audio start-up, glow restart, ripple and note-timed movement from
   Prototypes 5, 6 and 8.
 - The garden, object and storybook pictures, and the code in this repository, were made with the
-  help of Claude, an AI assistant.
+  help of Claude, an AI assistant. The pictures were first drawn as SVG files and then exported as
+  the still WebP pictures used here.
 - The storybook cover and buttons follow the style of a button reference sheet I provided: a home
-  button, a pink notebook, a wooden Start sign and a path of round garden preview buttons.
+  button, a pink notebook, a wooden Start sign and a path of numbered dots.
 - The lettering in the storybook pictures uses the Fredoka and Gochi Hand fonts from Google Fonts
   (SIL Open Font License). It is part of the pictures, so the pages load no fonts.
 
