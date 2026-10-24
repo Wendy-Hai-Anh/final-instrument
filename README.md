@@ -11,10 +11,9 @@ and it fills the whole browser window.
 
 - `index.html` is a picture book that opens, turns and closes like a real one. Tapping the cover
   opens it, the big arrows or a swipe turn the pages and the cross closes it. After a title
-  spread, each garden has its own spread: its picture on the left and three of its friends with
-  a gold play button on the right. Tapping either page zooms into the garden. `style.css` lays out
-  the book and `storybook.js` turns its pages, plays a soft paper rustle and zooms in and out of
-  the gardens.
+  spread, each garden fills both pages as one complete picture with a small play button in the
+  corner. Tapping anywhere on the spread zooms into the garden. `style.css` lays out the book and
+  `storybook.js` turns its pages, plays a soft paper rustle and zooms in and out of the gardens.
 - `base.css` holds the colour tokens and picture buttons that every page shares, and the
   responsive scene, the objects and the visual feedback that every garden shares.
 - `garden.js` holds the sound and interaction that every garden shares.
