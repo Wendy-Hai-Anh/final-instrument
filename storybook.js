@@ -235,15 +235,18 @@ function handleTurnButton(event) {
 
 // A swipe across the book turns the page, like dragging paper with a finger.
 book.addEventListener("pointerdown", event => {
+    if (!event.isPrimary || event.button !== 0) return;
+
     swipe = {
         x: event.clientX,
         y: event.clientY,
+        pointerId: event.pointerId,
         hasTurned: false
     };
 });
 
 book.addEventListener("pointerup", event => {
-    if (!swipe) return;
+    if (!swipe || event.pointerId !== swipe.pointerId) return;
 
     const distanceX = event.clientX - swipe.x;
     const distanceY = event.clientY - swipe.y;
@@ -252,6 +255,15 @@ book.addEventListener("pointerup", event => {
         swipe.hasTurned = true;
         goTo(distanceX < 0 ? spread + 1 : spread - 1);
     }
+});
+
+book.addEventListener("pointercancel", () => {
+    swipe = null;
+});
+
+// Prevent the browser's image-link drag from taking over a mouse or touch page turn.
+book.addEventListener("dragstart", event => {
+    event.preventDefault();
 });
 
 // A swipe ends with a click on the page under the finger, which must not also open a garden.

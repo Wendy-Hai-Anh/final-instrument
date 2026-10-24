@@ -44,10 +44,7 @@ body {
 
 /* Picture buttons */
 
-/*
-Every storybook button is a picture with a second picture laid over it for hover and keyboard
-focus, so the buttons keep their drawn look.
-*/
+/* Every storybook control swaps between two painted states without changing its hit area. */
 .buttonImage,
 .buttonHover {
     display: block;
@@ -70,6 +67,21 @@ a[aria-current="page"] .buttonHover,
 button:hover .buttonHover,
 button:focus-visible .buttonHover {
     opacity: 1;
+}
+
+/* Home and page controls stand raised at rest, then flatten when pressed or pointed at. */
+.homeButton .buttonHover,
+.bookButton .buttonHover {
+    opacity: 1;
+}
+
+.homeButton:hover .buttonHover,
+.homeButton:focus-visible .buttonHover,
+.homeButton:active .buttonHover,
+.bookButton:hover .buttonHover,
+.bookButton:focus-visible .buttonHover,
+.bookButton:active .buttonHover {
+    opacity: 0;
 }
 
 /* Storybook buttons */
