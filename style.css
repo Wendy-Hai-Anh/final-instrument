@@ -16,35 +16,18 @@ by base.css and each version's own stylesheet.
     background-size: 20rem, cover;
 }
 
-/*
-Landscape windows put an arrow on each side of the book. Portrait windows put the book on top
-and both arrows under it, where small hands can reach them.
-*/
+/* The open book uses nearly the whole window, with page controls sitting at its outer edges. */
 .storybookStage {
-    --controlSize: clamp(4.5rem, 12vmin, 6.5rem);
-    --gap: clamp(0.75rem, 2.5vmin, 1.5rem);
+    --controlSize: clamp(3.5rem, 9vmin, 5.5rem);
+    --gap: clamp(0.5rem, 1.5vmin, 1rem);
     --noteSpace: 5rem;
-    display: grid;
-    grid-template-areas: "back book next";
-    grid-template-columns: var(--controlSize) auto var(--controlSize);
+    position: relative;
+    display: flex;
     justify-content: center;
-    align-content: center;
     align-items: center;
-    gap: var(--gap);
     min-height: 100vh;
     min-height: 100dvh;
     padding: var(--gap) var(--gap) var(--noteSpace);
-}
-
-@media (orientation: portrait) {
-    .storybookStage {
-        grid-template-areas:
-            "book book"
-            "back next";
-        grid-template-columns: 1fr 1fr;
-        justify-items: center;
-        row-gap: calc(var(--gap) * 2);
-    }
 }
 
 /* Book */
@@ -54,11 +37,10 @@ The book is the size of the open spread. Every part inside it is placed as a sha
 1740 by 1140 open-book picture, so the pages line up at any size.
 */
 .book {
-    --bookWidth: min(100vw - 2 * var(--controlSize) - 4 * var(--gap),
-            (100dvh - var(--noteSpace) - 2 * var(--gap)) * 1740 / 1140);
+    --bookWidth: min(calc(100vw - 2 * var(--gap)),
+            calc((100dvh - var(--noteSpace) - 2 * var(--gap)) * 1740 / 1140));
     --closedScale: 1;
     position: relative;
-    grid-area: book;
     width: var(--bookWidth);
     aspect-ratio: 1740 / 1140;
     perspective: 3200px;
@@ -67,18 +49,6 @@ The book is the size of the open spread. Every part inside it is placed as a sha
     touch-action: pan-y;
     user-select: none;
     -webkit-user-select: none;
-}
-
-@media (orientation: portrait) {
-    .book {
-        /* A closed book is half as wide, so it grows to fill the space while it is shut. */
-        --closedScale: 1.6;
-        --bookWidth: min(100vw - 2 * var(--gap),
-                (100dvh - var(--noteSpace) - var(--controlSize) - 5 * var(--gap)) /
-                var(--closedScale) * 1740 / 1140);
-        /* Room above and below for the grown closed book, so it never covers the arrows. */
-        margin-block: calc(var(--bookWidth) * 1140 / 1740 * (var(--closedScale) - 1) / 2);
-    }
 }
 
 /* A closed book slides over so the cover, not the spine, sits in the middle. */
@@ -100,6 +70,13 @@ The book is the size of the open spread. Every part inside it is placed as a sha
     left: 50%;
     width: 50%;
     height: 100%;
+    opacity: 1;
+    transition: opacity 0.2s ease-out;
+}
+
+/* Hiding the back board while shut prevents its bookmark from appearing as a second ribbon. */
+.book[data-spread="0"] .bookBack {
+    opacity: 0;
 }
 
 /* Pages are paper only and sit inside the board; the cover is the whole board. */
@@ -243,6 +220,7 @@ The book is the size of the open spread. Every part inside it is placed as a sha
 /* The arrows and the cross are pictures with a raised picture laid over them for hover. */
 .bookButton {
     position: relative;
+    z-index: 60;
     display: block;
     width: var(--controlSize);
     padding: 0;
@@ -259,11 +237,17 @@ The book is the size of the open spread. Every part inside it is placed as a sha
 }
 
 .backButton {
-    grid-area: back;
+    position: fixed;
+    top: 50%;
+    left: var(--gap);
+    translate: 0 -50%;
 }
 
 .nextButton {
-    grid-area: next;
+    position: fixed;
+    top: 50%;
+    right: var(--gap);
+    translate: 0 -50%;
 }
 
 .closeButton {
@@ -271,6 +255,58 @@ The book is the size of the open spread. Every part inside it is placed as a sha
     top: var(--gap);
     right: var(--gap);
     z-index: 2;
+}
+
+/* Upright phones show a clear visual cue instead of squeezing the two-page book. */
+.rotateNotice {
+    display: none;
+}
+
+@media (orientation: portrait) and (max-width: 37.5rem) {
+    .storybookStage {
+        display: none;
+    }
+
+    .rotateNotice {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 2rem;
+        color: #702d23;
+        background: rgb(253 240 216 / 94%);
+        text-align: center;
+    }
+
+    .phonePicture {
+        position: relative;
+        width: 4.5rem;
+        height: 7.5rem;
+        border: 0.35rem solid #702d23;
+        border-radius: 0.8rem;
+        background: #f7cb5c;
+        rotate: 90deg;
+        box-shadow: 0.45rem 0.45rem 0 #c43d72;
+    }
+
+    .phonePicture::after {
+        position: absolute;
+        bottom: 0.35rem;
+        left: 50%;
+        width: 0.6rem;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: #702d23;
+        translate: -50% 0;
+        content: "";
+    }
+
+    .rotateNotice strong {
+        font-size: 1.35rem;
+    }
 }
 
 /* A button that has nothing to do fades away instead of jumping out of place. */
