@@ -1,7 +1,7 @@
 /*
-This stylesheet lays out the storybook that opens the gardens: the book in the middle, a big
-arrow on each side to turn the pages and a cross to close it. The gardens themselves are styled
-by base.css and each version's own stylesheet.
+This stylesheet lays out the storybook that opens the gardens. The book fills as much of the
+window as it can, the big arrows sit on its edges and a cross closes it. The gardens themselves
+are styled by base.css and each version's own stylesheet.
 */
 
 /* Storybook page */
@@ -10,36 +10,29 @@ by base.css and each version's own stylesheet.
 .storybookPage {
     overflow: hidden;
     background-color: #3e8a92;
-    background-image: url("assets/textures/paper-grain.webp"),
-        url("assets/storybook/backdrop.webp");
+    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261025"),
+        url("assets/storybook/backdrop.webp?v=picture-book-20261025");
     background-position: 0 0, center;
     background-size: 20rem, cover;
 }
 
-/* The open book uses nearly the whole window, with page controls sitting at its outer edges. */
 .storybookStage {
-    --controlSize: clamp(3.5rem, 9vmin, 5.5rem);
-    --gap: clamp(0.5rem, 1.5vmin, 1rem);
-    --noteSpace: 5rem;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: var(--gap) var(--gap) var(--noteSpace);
+    --gap: clamp(0.5rem, 2vmin, 1.25rem);
+    --controlSize: clamp(3.5rem, 10vmin, 6rem);
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
 }
 
 /* Book */
 
 /*
-The book is the size of the open spread. Every part inside it is placed as a share of the
-1740 by 1140 open-book picture, so the pages line up at any size.
+The open book is as large as the window allows. Every part inside it is placed as a share of
+the 1740 by 1140 open-book picture, so the pages line up at any size.
 */
 .book {
-    --bookWidth: min(calc(100vw - 2 * var(--gap)),
-            calc((100dvh - var(--noteSpace) - 2 * var(--gap)) * 1740 / 1140));
-    --closedScale: 1;
+    --bookWidth: min(100vw - 2 * var(--gap), (100dvh - 2 * var(--gap)) * 1740 / 1140);
     position: relative;
     width: var(--bookWidth);
     aspect-ratio: 1740 / 1140;
@@ -51,13 +44,17 @@ The book is the size of the open spread. Every part inside it is placed as a sha
     -webkit-user-select: none;
 }
 
-/* A closed book slides over so the cover, not the spine, sits in the middle. */
+/*
+A closed book slides over so the cover sits in the middle, and grows when there is room, since
+it is only half as wide as the open book. storybook.js works out how much it can grow.
+*/
 .book[data-spread="0"] {
     translate: -25% 0;
-    scale: var(--closedScale);
+    scale: var(--closedScale, 1);
 }
 
 .bookBack,
+.bookRibbon,
 .leaf,
 .stillPage,
 .spineRings {
@@ -70,13 +67,14 @@ The book is the size of the open spread. Every part inside it is placed as a sha
     left: 50%;
     width: 50%;
     height: 100%;
-    opacity: 1;
-    transition: opacity 0.2s ease-out;
 }
 
-/* Hiding the back board while shut prevents its bookmark from appearing as a second ribbon. */
-.book[data-spread="0"] .bookBack {
-    opacity: 0;
+/* The ribbon hangs from the spine of the open book. */
+.bookRibbon {
+    top: 92.105%;
+    left: 51.149%;
+    width: 4.598%;
+    height: 7.895%;
 }
 
 /* Pages are paper only and sit inside the board; the cover is the whole board. */
@@ -121,43 +119,16 @@ The book is the size of the open spread. Every part inside it is placed as a sha
     rotate: y 180deg;
 }
 
+.stillPage {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
 .pageImage {
     display: block;
     width: 100%;
     height: 100%;
     -webkit-user-drag: none;
-}
-
-/* One wide picture is split between the two visible pages so the whole garden stays together. */
-.spreadHalf {
-    overflow: hidden;
-}
-
-.spreadImage {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: block;
-    width: 200%;
-    max-width: none;
-    height: 100%;
-    object-fit: fill;
-    pointer-events: none;
-    user-select: none;
-    -webkit-user-drag: none;
-}
-
-.spreadRight .spreadImage {
-    left: -100%;
-}
-
-/* The inside cover uses the same paper rectangle as the facing page. */
-.pagePanel {
-    position: absolute;
-    top: 5.2632%;
-    right: 0;
-    width: 91.7242%;
-    height: 83.5088%;
 }
 
 /* A soft shadow falls across a page as it lifts, the way paper darkens when it bends. */
@@ -187,11 +158,16 @@ The book is the size of the open spread. Every part inside it is placed as a sha
     width: 8.046%;
     height: 83.5088%;
     pointer-events: none;
+}
+
+.spineRings,
+.bookRibbon {
     opacity: 0;
     transition: opacity 0.2s;
 }
 
-.book.showsRings .spineRings {
+.book.showsRings .spineRings,
+.book.showsRings .bookRibbon {
     opacity: 1;
 }
 
@@ -201,11 +177,14 @@ The book is the size of the open spread. Every part inside it is placed as a sha
     color: inherit;
 }
 
-/* The small corner button confirms that the entire illustrated spread opens the garden. */
+/*
+Tapping anywhere on a garden's spread opens it. The small gold play button in the corner breathes
+as a reminder that the picture can be tapped.
+*/
 .playButton {
     position: absolute;
-    right: 4%;
-    bottom: 4%;
+    right: 5%;
+    bottom: 5%;
     width: 15%;
     height: auto;
     pointer-events: none;
@@ -219,13 +198,13 @@ The book is the size of the open spread. Every part inside it is placed as a sha
     }
 
     50% {
-        scale: 1.1;
+        scale: 1.12;
     }
 }
 
 .bookPage:focus-visible,
-.bookButton:focus-visible,
-.coverLeaf .leafFront:focus-visible {
+.leafFace:focus-visible,
+.bookButton:focus-visible {
     outline: 4px solid var(--cream);
     outline-offset: 0.3rem;
 }
@@ -249,7 +228,10 @@ The book is the size of the open spread. Every part inside it is placed as a sha
 
 /* Big buttons */
 
-/* The arrows and the cross are pictures with a raised picture laid over them for hover. */
+/*
+The arrows and the cross are pictures: the raised one shows at rest and the flat one shows on
+hover, as if the button were being pressed down.
+*/
 .bookButton {
     position: relative;
     z-index: 60;
@@ -268,77 +250,25 @@ The book is the size of the open spread. Every part inside it is placed as a sha
     scale: 0.94;
 }
 
-.backButton {
-    position: fixed;
+/* The arrows sit over the left and right edges of the book, halfway down. */
+.turnButton {
+    position: absolute;
     top: 50%;
-    left: var(--gap);
     translate: 0 -50%;
 }
 
+.backButton {
+    left: 1.5%;
+}
+
 .nextButton {
-    position: fixed;
-    top: 50%;
-    right: var(--gap);
-    translate: 0 -50%;
+    right: 1.5%;
 }
 
 .closeButton {
     position: fixed;
     top: var(--gap);
     right: var(--gap);
-    z-index: 2;
-}
-
-/* Upright phones show a clear visual cue instead of squeezing the two-page book. */
-.rotateNotice {
-    display: none;
-}
-
-@media (orientation: portrait) and (max-width: 37.5rem) {
-    .storybookStage {
-        display: none;
-    }
-
-    .rotateNotice {
-        position: fixed;
-        inset: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 2rem;
-        color: #702d23;
-        background: rgb(253 240 216 / 94%);
-        text-align: center;
-    }
-
-    .phonePicture {
-        position: relative;
-        width: 4.5rem;
-        height: 7.5rem;
-        border: 0.35rem solid #702d23;
-        border-radius: 0.8rem;
-        background: #f7cb5c;
-        rotate: 90deg;
-        box-shadow: 0.45rem 0.45rem 0 #c43d72;
-    }
-
-    .phonePicture::after {
-        position: absolute;
-        bottom: 0.35rem;
-        left: 50%;
-        width: 0.6rem;
-        aspect-ratio: 1;
-        border-radius: 50%;
-        background: #702d23;
-        translate: -50% 0;
-        content: "";
-    }
-
-    .rotateNotice strong {
-        font-size: 1.35rem;
-    }
 }
 
 /* A button that has nothing to do fades away instead of jumping out of place. */
@@ -349,19 +279,18 @@ The book is the size of the open spread. Every part inside it is placed as a sha
 
 /* Grown-up note */
 
-/* The note for grown-ups is small and only shows while the book is shut. */
+/* The note for grown-ups is small, sits in a corner beside the cover and only shows while shut. */
 .grownUpNote {
     position: fixed;
-    bottom: 0.75rem;
-    left: 50%;
-    width: min(36rem, 100vw - 2rem);
+    bottom: var(--gap);
+    left: var(--gap);
+    width: min(17rem, 22vw);
     margin: 0;
-    padding: 0.5rem 0.9rem;
-    border-radius: 0.8rem;
+    padding: 0.45rem 0.7rem;
+    border-radius: 0.6rem;
     background-color: rgb(253 240 216 / 90%);
-    font-size: 0.85rem;
-    line-height: 1.45;
-    translate: -50% 0;
+    font-size: 0.75rem;
+    line-height: 1.4;
     transition: opacity 0.4s ease-out;
 }
 
@@ -379,7 +308,7 @@ over it, so the garden page seems to grow out of the book.
 .storybookStage::after {
     position: fixed;
     inset: 0;
-    z-index: 3;
+    z-index: 70;
     background-color: var(--gardenWash, #f6bcd3);
     opacity: 0;
     pointer-events: none;
@@ -403,6 +332,64 @@ over it, so the garden page seems to grow out of the book.
     transition: none;
 }
 
+/* Turn sideways */
+
+/*
+A phone or tablet held upright is too narrow for an open book, so, as in The Magical Pantry, it
+shows a picture asking for the screen to be turned on its side.
+*/
+.turnSideways {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    background: inherit;
+    text-align: center;
+}
+
+.turnSideways img {
+    width: min(60vw, 14rem);
+    height: auto;
+    animation: turn-hint 2.4s ease-in-out infinite;
+}
+
+.turnSideways p {
+    max-width: 16rem;
+    margin: 0;
+    padding: 0.45rem 0.8rem;
+    border-radius: 0.6rem;
+    background-color: rgb(253 240 216 / 90%);
+    font-size: 0.85rem;
+}
+
+@keyframes turn-hint {
+    0%,
+    20% {
+        rotate: -90deg;
+    }
+
+    55%,
+    100% {
+        rotate: 0deg;
+    }
+}
+
+@media (orientation: portrait) and (max-width: 600px),
+    (orientation: portrait) and (pointer: coarse) {
+    .turnSideways {
+        display: flex;
+    }
+
+    .storybookStage {
+        visibility: hidden;
+    }
+}
+
 /* Reduced motion turns pages and opens the book without movement. */
 @media (prefers-reduced-motion: reduce) {
     .book,
@@ -412,6 +399,7 @@ over it, so the garden page seems to grow out of the book.
     }
 
     .playButton,
+    .turnSideways img,
     .book[data-spread="0"] .coverLeaf {
         animation: none;
     }

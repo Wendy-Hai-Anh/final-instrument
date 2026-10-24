@@ -28,7 +28,7 @@ body {
     margin: 0;
     color: var(--ink);
     background-color: var(--cream);
-    background-image: url("assets/textures/paper-grain.webp");
+    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261025");
     background-size: 20rem;
     font-family: Georgia, "Times New Roman", serif;
 }
@@ -44,7 +44,10 @@ body {
 
 /* Picture buttons */
 
-/* Every storybook control swaps between two painted states without changing its hit area. */
+/*
+Every storybook button is a picture with a second picture laid over it for hover and keyboard
+focus, so the buttons keep their drawn look.
+*/
 .buttonImage,
 .buttonHover {
     display: block;
@@ -67,21 +70,6 @@ a[aria-current="page"] .buttonHover,
 button:hover .buttonHover,
 button:focus-visible .buttonHover {
     opacity: 1;
-}
-
-/* Home and page controls stand raised at rest, then flatten when pressed or pointed at. */
-.homeButton .buttonHover,
-.bookButton .buttonHover {
-    opacity: 1;
-}
-
-.homeButton:hover .buttonHover,
-.homeButton:focus-visible .buttonHover,
-.homeButton:active .buttonHover,
-.bookButton:hover .buttonHover,
-.bookButton:focus-visible .buttonHover,
-.bookButton:active .buttonHover {
-    opacity: 0;
 }
 
 /* Storybook buttons */
@@ -126,7 +114,7 @@ who cannot read numbers can still find a garden, and the current one has a gold 
     right: calc(var(--buttonSize) * 0.4);
     left: calc(var(--buttonSize) * 0.4);
     height: calc(var(--buttonSize) * 0.2);
-    background: url("assets/buttons/path-across.webp") center / 100% 100%;
+    background: url("assets/buttons/path-across.webp?v=picture-book-20261025") center / 100% 100%;
     translate: 0 -50%;
     content: "";
 }

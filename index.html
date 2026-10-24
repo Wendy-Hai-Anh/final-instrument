@@ -5,10 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Garden of Sounds</title>
-    <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="base.css?v=storybook-refinement-20261025">
-    <link rel="stylesheet" href="style.css?v=storybook-refinement-20261025">
-    <script src="storybook.js?v=storybook-refinement-20261025" defer></script>
+    <link rel="stylesheet" href="base.css?v=picture-book-20261025">
+    <link rel="stylesheet" href="style.css?v=picture-book-20261025">
+    <script src="storybook.js?v=picture-book-20261025" defer></script>
 </head>
 
 <body class="storybookPage">
@@ -18,112 +17,116 @@
     picture, so the book can be read without words.
     -->
 
-    <aside class="rotateNotice" aria-label="Rotate your phone">
-        <span class="phonePicture" aria-hidden="true"></span>
-        <strong>Turn your phone sideways</strong>
-        <span>The picture book needs a little more room.</span>
-    </aside>
-
     <main class="storybookStage">
         <h1 class="visuallyHidden">Garden of Sounds</h1>
         <p id="book-status" class="visuallyHidden" role="status"></p>
 
-        <button class="bookButton backButton" type="button" data-turn="back">
-            <img class="buttonImage" src="assets/buttons/back.webp" alt="Turn back a page"
-                width="280" height="280">
-            <img class="buttonHover" src="assets/buttons/back-raised.webp" alt="" width="280"
-                height="280">
-        </button>
-
         <!--
         The book is built like a real one. Each leaf has a front and a back, and turning a leaf
         rotates it over the spine. The cover is the first leaf; the last right page lies flat.
+        Every picture after the title runs across both pages of its spread.
         -->
         <div class="book" data-spread="0">
-            <img class="bookBack" src="assets/storybook/book-back.webp" alt="" width="870"
-                height="1140">
+            <img class="bookBack" src="assets/storybook/book-back.webp?v=picture-book-20261025" alt="" width="870"
+                height="1140" draggable="false">
+            <img class="bookRibbon" src="assets/storybook/ribbon.webp?v=picture-book-20261025" alt="" width="80"
+                height="90" draggable="false">
 
-            <a class="bookPage stillPage gardenPage spreadHalf spreadRight"
-                href="versions/flower-meadow/index.html" data-garden="flower-meadow">
-                <img class="spreadImage" src="assets/storybook/spread-flower-meadow.webp"
-                    alt="Play in the giant flower meadow" width="1596" height="952">
-                <img class="playButton" src="assets/buttons/play.webp" alt="" width="240"
-                    height="240">
+            <a class="bookPage stillPage gardenPage" href="versions/flower-meadow/index.html?v=picture-book-20261025"
+                data-garden="flower-meadow" draggable="false">
+                <img class="pageImage" src="assets/storybook/page-flower-meadow-right.webp?v=picture-book-20261025"
+                    alt="Play in the giant flower meadow" width="798" height="952"
+                    draggable="false">
+                <img class="playButton" src="assets/buttons/play.webp?v=picture-book-20261025" alt="" width="240"
+                    height="240" draggable="false">
             </a>
 
             <div class="leaf coverLeaf">
                 <button class="leafFace leafFront" type="button" data-turn="next">
-                    <img class="pageImage" src="assets/storybook/book-closed.webp"
-                        alt="Garden of Sounds. Open the book" width="870" height="1140">
+                    <img class="pageImage" src="assets/storybook/book-closed.webp?v=picture-book-20261025"
+                        alt="Garden of Sounds. Open the book" width="870" height="1140"
+                        draggable="false">
                 </button>
-                <div class="leafFace leafBack">
-                    <div class="pagePanel spreadHalf spreadLeft">
-                        <img class="spreadImage" src="assets/storybook/spread-title.webp"
-                            alt="Once upon a time" width="1596" height="952">
-                    </div>
-                </div>
-            </div>
-
-            <div class="leaf">
-                <button class="leafFace leafFront bookPage spreadHalf spreadRight" type="button"
-                    data-turn="next">
-                    <img class="spreadImage" src="assets/storybook/spread-title.webp"
-                        alt="In a garden full of sounds. Turn the page" width="1596" height="952">
+                <button class="leafFace leafBack" type="button" data-turn="next">
+                    <img class="pageImage" src="assets/storybook/cover-inside.webp?v=picture-book-20261025"
+                        alt="Once upon a time," width="870" height="1140" draggable="false">
                 </button>
-                <a class="leafFace leafBack bookPage gardenPage spreadHalf spreadLeft"
-                    href="versions/lakeside-picnic/index.html" data-garden="lakeside-picnic">
-                    <img class="spreadImage" src="assets/storybook/spread-lakeside-picnic.webp"
-                        alt="Play in the lakeside picnic" width="1596" height="952">
+            </div>
+
+            <div class="leaf">
+                <button class="leafFace leafFront bookPage" type="button" data-turn="next">
+                    <img class="pageImage" src="assets/storybook/page-title-right.webp?v=picture-book-20261025"
+                        alt="in a garden full of sounds. Turn the page" width="798" height="952"
+                        draggable="false">
+                </button>
+                <a class="leafFace leafBack bookPage gardenPage"
+                    href="versions/lakeside-picnic/index.html?v=picture-book-20261025" data-garden="lakeside-picnic"
+                    draggable="false">
+                    <img class="pageImage" src="assets/storybook/page-lakeside-picnic-left.webp?v=picture-book-20261025"
+                        alt="Lakeside picnic" width="798" height="952" draggable="false">
                 </a>
             </div>
 
             <div class="leaf">
-                <a class="leafFace leafFront bookPage gardenPage spreadHalf spreadRight"
-                    href="versions/lakeside-picnic/index.html" data-garden="lakeside-picnic">
-                    <img class="spreadImage" src="assets/storybook/spread-lakeside-picnic.webp"
-                        alt="Play in the lakeside picnic" width="1596" height="952">
-                    <img class="playButton" src="assets/buttons/play.webp" alt="" width="240"
-                        height="240">
+                <a class="leafFace leafFront bookPage gardenPage"
+                    href="versions/lakeside-picnic/index.html?v=picture-book-20261025" data-garden="lakeside-picnic"
+                    draggable="false">
+                    <img class="pageImage" src="assets/storybook/page-lakeside-picnic-right.webp?v=picture-book-20261025"
+                        alt="Play in the lakeside picnic" width="798" height="952"
+                        draggable="false">
+                    <img class="playButton" src="assets/buttons/play.webp?v=picture-book-20261025" alt="" width="240"
+                        height="240" draggable="false">
                 </a>
-                <a class="leafFace leafBack bookPage gardenPage spreadHalf spreadLeft"
-                    href="versions/painted-orchard/index.html" data-garden="painted-orchard">
-                    <img class="spreadImage" src="assets/storybook/spread-painted-orchard.webp"
-                        alt="Play in the painted orchard" width="1596" height="952">
+                <a class="leafFace leafBack bookPage gardenPage"
+                    href="versions/painted-orchard/index.html?v=picture-book-20261025" data-garden="painted-orchard"
+                    draggable="false">
+                    <img class="pageImage" src="assets/storybook/page-painted-orchard-left.webp?v=picture-book-20261025"
+                        alt="Painted orchard" width="798" height="952" draggable="false">
                 </a>
             </div>
 
             <div class="leaf">
-                <a class="leafFace leafFront bookPage gardenPage spreadHalf spreadRight"
-                    href="versions/painted-orchard/index.html" data-garden="painted-orchard">
-                    <img class="spreadImage" src="assets/storybook/spread-painted-orchard.webp"
-                        alt="Play in the painted orchard" width="1596" height="952">
-                    <img class="playButton" src="assets/buttons/play.webp" alt="" width="240"
-                        height="240">
+                <a class="leafFace leafFront bookPage gardenPage"
+                    href="versions/painted-orchard/index.html?v=picture-book-20261025" data-garden="painted-orchard"
+                    draggable="false">
+                    <img class="pageImage" src="assets/storybook/page-painted-orchard-right.webp?v=picture-book-20261025"
+                        alt="Play in the painted orchard" width="798" height="952"
+                        draggable="false">
+                    <img class="playButton" src="assets/buttons/play.webp?v=picture-book-20261025" alt="" width="240"
+                        height="240" draggable="false">
                 </a>
-                <a class="leafFace leafBack bookPage gardenPage spreadHalf spreadLeft"
-                    href="versions/flower-meadow/index.html" data-garden="flower-meadow">
-                    <img class="spreadImage" src="assets/storybook/spread-flower-meadow.webp"
-                        alt="Play in the giant flower meadow" width="1596" height="952">
+                <a class="leafFace leafBack bookPage gardenPage"
+                    href="versions/flower-meadow/index.html?v=picture-book-20261025" data-garden="flower-meadow"
+                    draggable="false">
+                    <img class="pageImage" src="assets/storybook/page-flower-meadow-left.webp?v=picture-book-20261025"
+                        alt="Giant flower meadow" width="798" height="952" draggable="false">
                 </a>
             </div>
 
             <!-- The rings stay on top while the pages turn around them. -->
-            <img class="spineRings" src="assets/storybook/spine-rings.webp" alt="" width="140"
-                height="952">
+            <img class="spineRings" src="assets/storybook/spine-rings.webp?v=picture-book-20261025" alt="" width="140"
+                height="952" draggable="false">
+
+            <!-- The arrows sit on the edges of the book, over the pages. -->
+            <button class="bookButton turnButton backButton" type="button" data-turn="back">
+                <img class="buttonImage" src="assets/buttons/back-raised.webp?v=picture-book-20261025"
+                    alt="Turn back a page" width="280" height="280" draggable="false">
+                <img class="buttonHover" src="assets/buttons/back.webp?v=picture-book-20261025" alt="" width="280"
+                    height="280" draggable="false">
+            </button>
+            <button class="bookButton turnButton nextButton" type="button" data-turn="next">
+                <img class="buttonImage" src="assets/buttons/next-raised.webp?v=picture-book-20261025" alt="Turn the page"
+                    width="280" height="280" draggable="false">
+                <img class="buttonHover" src="assets/buttons/next.webp?v=picture-book-20261025" alt="" width="280"
+                    height="280" draggable="false">
+            </button>
         </div>
 
-        <button class="bookButton nextButton" type="button" data-turn="next">
-            <img class="buttonImage" src="assets/buttons/next.webp" alt="Turn the page"
-                width="280" height="280">
-            <img class="buttonHover" src="assets/buttons/next-raised.webp" alt="" width="280"
-                height="280">
-        </button>
-
         <button class="bookButton closeButton" type="button" data-turn="close">
-            <img class="buttonImage" src="assets/buttons/close.webp" alt="Close the book"
-                width="280" height="280">
-            <img class="buttonHover" src="assets/buttons/close-raised.webp" alt="" width="280"
-                height="280">
+            <img class="buttonImage" src="assets/buttons/close-raised.webp?v=picture-book-20261025" alt="Close the book"
+                width="280" height="280" draggable="false">
+            <img class="buttonHover" src="assets/buttons/close.webp?v=picture-book-20261025" alt="" width="280"
+                height="280" draggable="false">
         </button>
 
         <p class="grownUpNote">
@@ -132,6 +135,12 @@
             and drag it to move it.
         </p>
     </main>
+
+    <!-- Like a picture book held open, the book needs a phone turned on its side. -->
+    <div class="turnSideways" aria-live="polite">
+        <img src="assets/storybook/turn-phone.webp?v=picture-book-20261025" alt="" width="360" height="300">
+        <p>Turn your screen sideways to open the book.</p>
+    </div>
 </body>
 
 </html>

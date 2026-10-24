@@ -9,20 +9,23 @@ and it fills the whole browser window.
 
 ## Structure
 
-- `index.html` is a picture book that opens, turns and closes like a real one. Tapping the cover
-  opens it, the big arrows or a swipe turn the pages and the cross closes it. After a title
-  spread, each garden fills both pages as one complete picture with a small play button in the
-  corner. Tapping anywhere on the spread zooms into the garden. `style.css` lays out the book and
-  `storybook.js` turns its pages, plays a soft paper rustle and zooms in and out of the gardens.
+- `index.html` is a picture book that opens, turns and closes like a real one and fills as much
+  of the window as it can. Tapping the cover opens it, the big arrows on its edges or a swipe
+  turn the pages and the cross closes it. The title spread reads "Once upon a time, in a garden
+  full of sounds..." across both pages, then each garden's whole picture runs across a spread of
+  its own, with a small gold play button; tapping anywhere on it zooms into the garden. Phones
+  held upright are asked to turn sideways. `style.css` lays out the book and `storybook.js` turns
+  its pages, plays a soft paper rustle and zooms in and out of the gardens.
 - `base.css` holds the colour tokens and picture buttons that every page shares, and the
   responsive scene, the objects and the visual feedback that every garden shares.
 - `garden.js` holds the sound and interaction that every garden shares.
 - `assets/textures/` holds the paper grain behind the page.
 - `assets/storybook/` holds the book pictures: the teal backdrop, the closed cover, the inside of
-  the cover, the back board, the spine rings and one picture for each page.
-  `assets/buttons/` holds the home, arrow, close and play buttons, and the round chapter buttons
-  (each a small picture of its garden, with a gold rim for the current one) and the path that
-  joins them.
+  the cover, the back board, the ribbon, the spine rings, a left and a right page for each
+  spread and the turn-sideways picture. `assets/buttons/` holds the home, arrow, close and play
+  buttons, and the round chapter buttons (each a small picture of its garden, with a gold rim
+  for the current one) and the path that joins them. Each white button is a raised picture
+  that turns flat on hover, as if pressed.
 - `versions/` holds one folder per garden:
   - `index.html` lists the objects and sets the garden's musical key and tempo. Its home button
     and chapter buttons lead back to the book, open on that garden's pages, and on to the other
@@ -88,7 +91,7 @@ Prototype 2's continuous pitch and Prototype 7's continuous spinning are not use
   the book with a cross from Sophia Guo's
   [Coffee Table Book](https://sophiaguo.design/playground/picture-book/), the activity living
   inside each spread from Kerrygold's [The Magical Pantry](https://www.themagicalpantry.com/) by
-  Makemepulse, and the zoom from the open book into its content from Ribbit's
+  Makemepulse, which also asks phones to be turned sideways, and the zoom from the open book into its content from Ribbit's
   [Process](https://ribbit.dk/process/) page. No code or artwork was taken from them.
 - The lettering in the storybook pictures uses the Fredoka and Gochi Hand fonts from Google Fonts
   (SIL Open Font License). It is part of the pictures, so the pages load no fonts.

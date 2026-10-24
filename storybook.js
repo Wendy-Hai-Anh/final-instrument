@@ -157,14 +157,41 @@ function goTo(newSpread) {
     bookStatus.textContent = spreadWords[spread];
 }
 
+/* Sizing the closed book ---------------------------------------------------- */
+/*
+A closed book is half as wide as an open one, so it grows as far as the window allows, while
+leaving the corner beside it free for the note for grown-ups.
+*/
+function sizeClosedBook() {
+    const openWidth = book.offsetWidth;
+    const openHeight = book.offsetHeight;
+    const noteRoom = document.querySelector(".grownUpNote").offsetWidth + 32;
+    const room = Math.min((window.innerWidth - 2 * noteRoom) / (openWidth / 2),
+        window.innerHeight * 0.94 / openHeight);
+
+    book.style.setProperty("--closedScale", String(Math.max(1, Math.min(room, 2))));
+}
+
 /* Stepping into a garden ---------------------------------------------------- */
 /*
-The book grows around the page that was tapped until that page fills the window, then a wash in
-the garden's colour fades in and the garden loads.
+The book grows around the spread that was tapped until its picture fills the window, then a wash
+in the garden's colour fades in and the garden loads.
 */
-function zoomOnto(pageElement) {
+function visiblePages() {
+    const left = leaves[spread - 1].querySelector(".leafBack");
+    const right = spread === lastSpread ? stillPage : leaves[spread].querySelector(".leafFront");
+    return [left, right];
+}
+
+function zoomOntoSpread() {
     const bookBox = book.getBoundingClientRect();
-    const pageBox = pageElement.getBoundingClientRect();
+    const [left, right] = visiblePages().map(page => page.getBoundingClientRect());
+    const pageBox = {
+        left: Math.min(left.left, right.left),
+        top: Math.min(left.top, right.top),
+        width: Math.max(left.right, right.right) - Math.min(left.left, right.left),
+        height: Math.max(left.bottom, right.bottom) - Math.min(left.top, right.top)
+    };
     const centreX = pageBox.left + pageBox.width / 2 - bookBox.left;
     const centreY = pageBox.top + pageBox.height / 2 - bookBox.top;
     const zoom = Math.max(window.innerWidth / pageBox.width, window.innerHeight / pageBox.height);
@@ -187,7 +214,7 @@ function enterGarden(link) {
     }
 
     isEntering = true;
-    zoomOnto(link);
+    zoomOntoSpread();
     document.body.classList.add("isEntering");
     window.setTimeout(() => window.location.assign(link.href), enterDuration);
 }
@@ -199,6 +226,12 @@ function openOnGarden(garden) {
 
     spread = index + 2;
     book.classList.add("isInstant");
+    // The note for grown-ups hides at once, rather than fading over the returning garden.
+    const grownUpNote = document.querySelector(".grownUpNote");
+    grownUpNote.style.transition = "none";
+    window.setTimeout(() => {
+        grownUpNote.style.transition = "";
+    }, enterDuration);
     leaves.forEach((leaf, leafIndex) => leaf.classList.toggle("isTurned", leafIndex < spread));
     stackLeaves();
     updateReachablePages();
@@ -211,8 +244,7 @@ function openOnGarden(garden) {
     }
 
     // Start zoomed into the garden's picture, then let the book shrink back to its place.
-    const picture = leaves[spread - 1].querySelector(".leafBack");
-    zoomOnto(picture);
+    zoomOntoSpread();
     void book.offsetWidth;
     book.classList.remove("isInstant");
     book.style.translate = "";
@@ -224,6 +256,7 @@ function openOnGarden(garden) {
 
 /* Taps, swipes and keys ----------------------------------------------------- */
 let swipe = null;
+let lastSwipeTime = 0;
 
 function handleTurnButton(event) {
     const turn = event.currentTarget.dataset.turn;
@@ -235,24 +268,25 @@ function handleTurnButton(event) {
 
 // A swipe across the book turns the page, like dragging paper with a finger.
 book.addEventListener("pointerdown", event => {
-    if (!event.isPrimary || event.button !== 0) return;
-
     swipe = {
         x: event.clientX,
-        y: event.clientY,
-        pointerId: event.pointerId,
-        hasTurned: false
+        y: event.clientY
     };
 });
 
+// Pictures and links must not be dragged away by the browser, or a swipe would never end.
+book.addEventListener("dragstart", event => event.preventDefault());
+
 book.addEventListener("pointerup", event => {
-    if (!swipe || event.pointerId !== swipe.pointerId) return;
+    if (!swipe) return;
 
     const distanceX = event.clientX - swipe.x;
     const distanceY = event.clientY - swipe.y;
+    swipe = null;
 
+    // Right to left turns forward, left to right turns back.
     if (Math.abs(distanceX) > swipeDistance && Math.abs(distanceX) > Math.abs(distanceY)) {
-        swipe.hasTurned = true;
+        lastSwipeTime = performance.now();
         goTo(distanceX < 0 ? spread + 1 : spread - 1);
     }
 });
@@ -261,18 +295,12 @@ book.addEventListener("pointercancel", () => {
     swipe = null;
 });
 
-// Prevent the browser's image-link drag from taking over a mouse or touch page turn.
-book.addEventListener("dragstart", event => {
-    event.preventDefault();
-});
-
-// A swipe ends with a click on the page under the finger, which must not also open a garden.
+// A swipe can end with a click on the page under the finger, which must not also open a garden.
 book.addEventListener("click", event => {
-    if (swipe && swipe.hasTurned) {
+    if (performance.now() - lastSwipeTime < 400) {
         event.preventDefault();
         event.stopPropagation();
     }
-    swipe = null;
 }, true);
 
 document.querySelectorAll("[data-turn]").forEach(button => {
@@ -297,6 +325,8 @@ document.addEventListener("keydown", event => {
 });
 
 /* Setup --------------------------------------------------------------------- */
+sizeClosedBook();
+window.addEventListener("resize", sizeClosedBook);
 stackLeaves();
 updateReachablePages();
 openOnGarden(window.location.hash.slice(1));
