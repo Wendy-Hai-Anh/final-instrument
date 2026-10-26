@@ -11,7 +11,7 @@ sank into its shadow, and letting go springs it back up. A quick tap still holds
 moment, so a child can see that the key answered.
 */
 const pushButtons = document.querySelectorAll(
-    ".homeButton, .chapterButton, .toolButton, .bookButton"
+    ".homeButton, .sideButton, .chapterButton, .toolButton, .bookButton"
 );
 const shortestPush = 140;
 

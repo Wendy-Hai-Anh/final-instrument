@@ -12,7 +12,7 @@ in a second stylesheet.
     font-style: normal;
     font-weight: 600;
     font-display: swap;
-    src: url("assets/fonts/fredoka-semibold-latin.woff2?v=picture-book-20261027b") format("woff2");
+    src: url("assets/fonts/fredoka-semibold-latin.woff2?v=picture-book-20261026h") format("woff2");
 }
 
 /* Colour tokens */
@@ -40,7 +40,7 @@ body {
     margin: 0;
     color: var(--ink);
     background-color: var(--cream);
-    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261027b");
+    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261026h");
     background-size: 20rem;
     font-family: Georgia, "Times New Roman", serif;
 }
@@ -91,6 +91,7 @@ a[aria-current="page"] .buttonHover,
 }
 
 .homeButton.isPushed .buttonImage,
+.sideButton.isPushed .buttonImage,
 .toolButton.isPushed .buttonImage,
 .bookButton.isPushed .buttonImage,
 .helpButton[aria-pressed="true"] .buttonImage {
@@ -162,7 +163,7 @@ least 75 pixels across, a size small fingers can hit.
     right: calc(var(--buttonSize) * 0.4);
     left: calc(var(--buttonSize) * 0.4);
     height: calc(var(--buttonSize) * 0.2);
-    background: url("assets/buttons/path-across.webp?v=picture-book-20261027b") center / 100% 100%;
+    background: url("assets/buttons/path-across.webp?v=picture-book-20261026h") center / 100% 100%;
     translate: 0 -50%;
     content: "";
 }
@@ -208,7 +209,31 @@ fill the top row, so these two move down to a second row.
     transition: opacity 0.3s ease-out;
 }
 
+/*
+The < and > keys sit halfway down the window's two sides, like the corners of a page to turn, and
+lead to the garden before and after this one.
+*/
+.sideButton {
+    position: fixed;
+    top: 50%;
+    z-index: 1;
+    display: block;
+    width: var(--navButtonSize);
+    border-radius: 25%;
+    translate: 0 -50%;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.previousGarden {
+    left: 0.75rem;
+}
+
+.nextGarden {
+    right: 0.75rem;
+}
+
 .homeButton:focus-visible,
+.sideButton:focus-visible,
 .chapterButton:focus-visible,
 .toolButton:focus-visible {
     outline: 3px solid var(--ink);
@@ -411,7 +436,7 @@ the object's own outline instead of a circle, and its colour comes from the gard
 
 .objectButton::after {
     position: absolute;
-    inset: -6%;
+    inset: -15%;
     z-index: -1;
     border-radius: 50%;
     background: radial-gradient(closest-side, var(--glowCore) 0%, var(--glowColour) 45%,
@@ -435,13 +460,13 @@ the object's own outline instead of a circle, and its colour comes from the gard
 
     10%,
     30% {
-        filter: brightness(1.06) saturate(1.1) drop-shadow(0 0 0.1rem var(--glowCore))
-            drop-shadow(0 0 0.35rem var(--glowColour));
+        filter: brightness(1.08) saturate(1.15) drop-shadow(0 0 0.15rem var(--glowCore))
+            drop-shadow(0 0 0.5rem var(--glowColour));
     }
 
     60% {
-        filter: brightness(1.03) saturate(1.05) drop-shadow(0 0 0.05rem var(--glowCore))
-            drop-shadow(0 0 0.5rem var(--glowColour));
+        filter: brightness(1.04) saturate(1.08) drop-shadow(0 0 0.1rem var(--glowCore))
+            drop-shadow(0 0 0.8rem var(--glowColour));
     }
 }
 
@@ -453,36 +478,36 @@ the object's own outline instead of a circle, and its colour comes from the gard
     }
 
     15% {
-        opacity: 0.35;
+        opacity: 0.85;
     }
 
     100% {
         opacity: 0;
-        scale: 1.15;
+        scale: 1.5;
     }
 }
 
 /* Playing state */
 
 /*
-A playing object keeps a small, translucent halo in the garden's colour, so a child can see at a
+A playing object keeps a soft halo in the garden's colour behind it, so a child can see at a
 glance which objects are making music. garden.js makes the halo pulse with every note and lets a
 small note float up from the object.
 */
 .playHalo {
     position: absolute;
-    inset: -12%;
+    inset: -22%;
     z-index: -2;
     border-radius: 50%;
-    background: radial-gradient(closest-side, rgb(255 255 255 / 95%) 0%, var(--glowCore) 35%,
-            var(--glowColour) 65%, transparent 100%);
+    background: radial-gradient(closest-side, rgb(255 255 255 / 70%) 0%, var(--glowCore) 40%,
+            var(--glowColour) 70%, transparent 100%);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease-out;
 }
 
 .gardenObject.isPlaying .playHalo {
-    opacity: 0.28;
+    opacity: 0.4;
 }
 
 .noteLayer {
@@ -518,11 +543,50 @@ small note float up from the object.
     }
 }
 
+/*
+Testers took the garden for a picture to tidy, and tried to put the fruit in the basket. Until an
+object has played, a small note in a gold bubble bobs at its top corner and says, without words,
+that it makes music. It fades once the object has sung.
+*/
+.noteBadge {
+    position: absolute;
+    top: -1.1rem;
+    right: -1.3rem;
+    width: clamp(1.9rem, 4.6vmin, 3rem);
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+    animation: note-bob 1.6s ease-in-out infinite;
+    transition: opacity 0.4s ease-out, scale 0.4s ease-out;
+}
+
+.gardenObject:nth-child(odd) .noteBadge {
+    animation-delay: -0.8s;
+}
+
+.hasPlayed .noteBadge {
+    opacity: 0;
+    scale: 0.4;
+}
+
+@keyframes note-bob {
+    0%,
+    100% {
+        translate: 0 0;
+        rotate: -8deg;
+    }
+
+    50% {
+        translate: 0 -0.4rem;
+        rotate: 8deg;
+    }
+}
+
 /* How-to-play guide */
 
 /*
 The guide covers the window. A dark shade with a round hole lights up the one object to play
-with. The play/stop key remains available to control the highlighted object. A hand taps on the
+with, and only that object, the guide's words and its cross can be pressed. A hand taps on the
 object, then shows a drag up or down and left or right, with an arrow where the drag ends.
 */
 .guide {
@@ -676,27 +740,12 @@ object, then shows a drag up or down and left or right, with an arrow where the 
     pointer-events: auto;
 }
 
-/* The guide's close key replaces Help in the same slot, so their pictures never overlap. */
-.isGuiding .helpButton {
-    visibility: hidden;
-}
-
-@media (max-width: 22rem) {
-    .guideClose {
-        top: calc(1.5rem + var(--navButtonSize));
-    }
-}
-
 /* While the guide runs, only the lit object can be played. */
 .isGuiding .storyNav,
+.isGuiding .sideButton,
 .isGuiding .gardenTools,
 .isGuiding .gardenObject:not(.isGuideTarget) {
     pointer-events: none;
-}
-
-/* The visible play/stop key remains usable while the guide blocks the other controls. */
-.isGuiding .quietButton {
-    pointer-events: auto;
 }
 
 /* Turning the phone */
@@ -817,6 +866,7 @@ so one small ring now spreads flat across the ground only where an object is put
     }
 
     .isSpringing .buttonImage,
+    .noteBadge,
     .guideSpot,
     .guideHand,
     .turnCard img {

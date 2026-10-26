@@ -28,7 +28,8 @@ and it fills the whole browser window.
 - `assets/storybook/` holds the book pictures: the teal backdrop, the closed cover, the inside of
   the cover, the back board, the ribbon, the spine rings, a left and a right page for each
   spread and the turn-sideways picture. `assets/buttons/` holds the home, arrow, close, play,
-  pause and help buttons, the floating note, the pointing hand, and the round chapter buttons
+  pause and help buttons, the < and > keys to the other gardens, the floating note and the gold
+  note bubble, the pointing hand, and the round chapter buttons
   (each a small picture of its garden, with a gold rim for the current one) and the path that
   joins them. Each square button is a raised picture that turns flat while it is pressed, as if
   it sank into its shadow, and springs back up on release (`button-press.js`); the garden button
@@ -40,7 +41,7 @@ and it fills the whole browser window.
 - `versions/` holds one folder per garden:
   - `index.html` lists the objects and sets the garden's musical key and tempo. Its home button
     and chapter buttons lead back to the book, open on that garden's pages, and on to the other
-    gardens.
+    gardens, and the < and > keys halfway down its sides lead to the garden before and after it.
   - `style.css` sets the glow colour and where each object starts on every screen shape.
   - `assets/backgrounds/` holds the garden picture in three shapes: wide, tall (square and
     portrait windows) and phone. Each one keeps the original picture in the middle and continues
@@ -63,34 +64,47 @@ and tempo. They keep the same ten object IDs and play by the same rules.
 
 The mapping and feedback come from peer testing of the eight Assignment 2 prototypes.
 
+- **One piece of music.** Testers heard the garden as noise once several objects played, because
+  each kept its own clock and roamed over three octaves. Now the whole garden keeps one beat at
+  its own tempo and one slow round of chords, I, vi, IV and V, two bars each, and every note an
+  object plays belongs to the chord of that moment. However many objects play, they play
+  together, in time and in harmony.
 - **Height picks the notes.** Prototype 1 changed the register in three steps, but a tester
-  moved an object a little and heard nothing change, so height is now read continuously: sixteen
-  steps of the garden's pentatonic scale run from the bottom of the window to the top, about
-  three octaves. Two objects a finger apart already sing different notes. One scale per garden
-  keeps any mix of objects in tune.
-- **Left to right picks the speed.** Prototype 3's second axis is read continuously too: notes
-  come about once a second at the left edge and seven times a second at the right, and a singing
-  object speeds up or slows down as it is dragged. Sound also pans gently with the object.
+  moved an object a little and heard nothing change, so height now picks one of eight rungs on a
+  ladder of the chord's notes, from the bottom of the window to the top. Tools start an octave
+  below the animals and fruits, so they sit under the melodies.
+- **Every object has its own notes.** Each object plays only from its own small set of rungs above
+  the one its height picks: the bird runs up and down four neighbouring notes, the butterfly
+  leaps, the snail stays close to home and the rake marks the chord's root and its octave.
+- **Left to right picks the speed.** Prototype 3's second axis now picks one of five rhythms laid
+  on the shared beat, from long notes at the left to two notes a beat at the right, with two
+  skipping three-three-two patterns between. Fruits keep to the slower ones. A singing object
+  changes rhythm as it is dragged, and its sound pans gently with it.
 - **The kind of object picks the sound family.** Gardening tools are soft drums, animals sing
   the melody and fruits are slow ambient textures.
 - **Resting objects breathe.** Each one swells a little every few seconds, so a child can see
   what can be touched without any words. Playing objects stop, since every note moves them.
+- **It looks like an instrument.** Testers took the garden for a picture to tidy and tried to
+  put the fruit in the basket. Until an object has played, a small note in a gold bubble bobs at
+  its corner, so every object says it makes music, and the bubble fades once the object has sung.
 - **One tap is enough.** A tap starts the object singing straight away and another tap stops it;
   dragging an object and letting go starts it from its new place. Every tap makes the object glow
   along its outline, adapted from Prototype 5.
 - **Every note moves the object,** adapted from Prototype 8. Tools sway, animals hop and fruits
   swell, which reuses Prototype 4's grow-and-bounce as a repeating effect.
-- **Playing objects glow.** A playing object keeps a soft halo in the garden's colour that
-  pulses with each note, and a small note floats up from it, so a child can see which objects
+- **Playing objects glow.** A playing object keeps a faint, soft halo in the garden's colour
+  that pulses gently with each note, and a small note floats up from it, so a child can see which objects
   are making music.
 - **Play the whole garden.** The button in the top corner lets every object join in, one after
-  another in a new random order each time, so a child who taps nothing still hears the garden
-  sing. While anything is playing the same button shows pause and stops it all.
+  another in a new random order each time and each on its next beat, so a child who taps nothing
+  still hears the garden sing as one piece. While anything is playing the same button shows pause and stops it all.
 - **A guide to play along with.** A tester watched the old demonstration and still did not know
   what to do, so the question-mark button now starts a guide. The garden dims, one animal is lit
   and a hand taps it with "Tap here!"; once the child taps it, the hand shows dragging it up or
-  down, then left or right, waiting each time until the child has tried. It starts by itself on a
-  first visit, and the cross or Escape ends it.
+  down, then to the right, to an arrow that stays in place; right rather than left, because a
+  speed-up is heard at once while a slow-down takes a while to notice. Each step passes as soon
+  as the animal comes most of the way to its arrow, even before the finger lifts. It starts by
+  itself every time a garden opens, and the cross or Escape ends it.
 - **One look.** The orchard and meadow objects have their outlines softened towards each
   garden's own deep colour, so they sit in those painterly pictures as the lakeside objects sit
   in its outlined one.
@@ -98,20 +112,21 @@ The mapping and feedback come from peer testing of the eight Assignment 2 protot
   after another, so they stand apart from the flowers, basket and lake in the picture.
 - **Drop to place.** Putting an object down starts it singing from its new place, and a small
   ripple spreads across the ground, adapted from Prototype 6. Dragging a resting object sounds
-  each step of the scale it passes, like a finger along a xylophone.
-- **Controlled randomness.** Every tap makes the object a new short tune, a few steps up and down
-  the scale from the note its height picks, so the same object sounds different each time it is
-  started. The tune repeats as the object's own song, but each time round one note may move a
-  step, with small changes in loudness, so it never quite repeats. Animals sometimes rest between
-  notes, and the whole tune moves up or down as the object does.
+  each rung it passes, like a finger along a xylophone.
+- **Controlled randomness.** Every tap makes the object a new short tune from its own set of
+  notes, so the same object sounds different each time it is started but always like itself. The
+  tune repeats as the object's own song, but each time round one note may swap for another from
+  the set, with small changes in loudness, so it never quite repeats. Animals sometimes rest
+  between notes, the whole tune moves up or down as the object does, and the chords underneath
+  give the same tune a new colour every two bars.
 - **A welcome tune.** Opening the storybook plays a short, bouncy run of notes with a bass bounce
   and a slide-whistle swoop, one of a few, so the toy greets a child before anything is tapped.
 - **Keyboard.** Tab moves between objects, Enter or Space starts and stops them, and the arrow
   keys move them.
 
-Prototype 7's continuous spinning is not used. Prototype 2's continuous pitch was not used at
-first, but testing showed the three-step mapping too hard to notice, so height and speed are now
-continuous as it was.
+Prototype 7's continuous spinning is not used. Prototype 2's continuous pitch was tried after
+testing showed the three-step mapping too hard to notice, but sixteen free steps per object
+sounded like noise together, so height now moves in eight steps that always fit the chord.
 
 ## Designed for young children
 

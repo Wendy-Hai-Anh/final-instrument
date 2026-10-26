@@ -2,14 +2,17 @@
 
 /*
 This script makes every garden object playable. Height sets the notes and place from left to
-right sets how quickly they come, and both change smoothly, so every move can be heard. A tap
-starts an object singing a short tune of its own, made new on every tap, and another tap stops
-it. Dropping an object after a drag starts it too. Each kind of action has its own feedback: a
-press squashes the object at once, a tap glows, every note moves the object and sends up a small
-note, a drop sends a ripple across the ground, and a tap on the garden itself sends a small
-ripple too, so no touch goes unanswered. Several fingers can play different objects at the same
-time. The play button lets the whole garden join in, one object after another, and stops it
-again; the help button starts a guide that a child plays along with.
+right sets how quickly they come. Every object has its own small set of notes, and the whole
+garden keeps one shared beat and one round of chords, so any mix of objects plays together as
+music. A tap starts an object singing a short tune from its set, made new on every tap, and
+another tap stops it. Dropping an object after a drag starts it too. Until an object has played,
+a small note bobs beside it, so the garden reads as an instrument rather than a picture to tidy.
+Each kind of action has its own feedback: a press squashes the object at once, a tap glows, every
+note moves the object and sends up a small note, a drop sends a ripple across the ground, and a
+tap on the garden itself sends a small ripple too, so no touch goes unanswered. Several fingers
+can play different objects at the same time. The play button lets the whole garden join in, one
+object after another, and stops it again; the help button starts a guide that a child plays
+along with.
 */
 
 /* Page elements and settings ------------------------------------------------ */
@@ -37,37 +40,53 @@ function buttonSource(name) {
 }
 
 /* Musical mapping ----------------------------------------------------------- */
-// Pentatonic steps never clash, so any mix of objects and places stays in tune.
-const pentatonicSteps = [0, 2, 4, 7, 9];
+/*
+Testers heard the old garden as noise once several objects played, since each one kept its own
+clock and wandered over three octaves. Now the whole garden shares one beat and one slow round of
+four chords, I, vi, IV and V, two bars each, and every note an object plays belongs to the chord
+of that moment. However many objects play, they sound like one piece of music.
+*/
+const chordRound = [
+    [0, 4, 7],
+    [0, 4, 9],
+    [0, 5, 9],
+    [2, 7, 11]
+];
+const barsPerChord = 2;
+const beatsPerBar = 16;
 
 /*
-Testers did not notice the sound change when an object moved a little, because the three pitch
-zones and three speeds of Prototypes 1 and 3 changed only at their borders. Height and place are
-now read continuously. Height picks one of sixteen steps of the garden's pentatonic scale, three
-octaves from the bottom of the window to the top, so two objects a finger apart already sing
-different notes. Place from left to right sets the gap between notes, from a slow stroll at the
-left edge to a quick patter at the right, and a playing object changes speed as it is dragged.
+Height picks one of eight rungs on a ladder made of the chord's notes, from the family's lowest
+octave up, so every move up or down a little way gives a new note that still fits. Place from left
+to right picks how often the notes come, from long, slow notes at the left to quick ones at the
+right. Every rhythm is laid on the shared beat, and two of them skip in a three-three-two pattern,
+which keeps the garden lively without anyone falling out of time.
 */
-const scaleSteps = 16;
-const lowestOctave = 3;
-const slowestGap = 1;
-const fastestGap = 0.15;
+const heightSteps = 8;
 const windowMargin = 0.08;
+const rhythms = [
+    { cycle: 16, hits: [0] },
+    { cycle: 16, hits: [0, 8] },
+    { cycle: 16, hits: [0, 6, 12] },
+    { cycle: 16, hits: [0, 4, 8, 12] },
+    { cycle: 8, hits: [0, 3, 6] },
+    { cycle: 8, hits: [0, 2, 4, 6] }
+];
 
 /* Each kind of object keeps the sound family planned in Assignment 1. */
 const families = {
-    // Tools are soft pitched drums, one octave lower so they sit under the melodies.
+    // Tools are soft pitched drums, an octave lower so they sit under the melodies.
     "gardening-tool": {
-        octaveShift: -1,
-        gapScale: 1,
-        tuneLength: [3, 4],
+        lowestOctave: 2,
+        rhythms: [1, 2, 3, 4, 5],
+        tuneLength: [2, 4],
         restChance: 0,
         noteLength: 0.2,
-        volume: -10,
+        volume: -16,
         motion: "sway",
         createSynth: () => new Tone.MembraneSynth({
             pitchDecay: 0.03,
-            octaves: 2.5,
+            octaves: 1.5,
             envelope: {
                 attack: 0.002,
                 decay: 0.32,
@@ -78,12 +97,12 @@ const families = {
     },
     // Animals sing the melody. An occasional rest makes each phrase breathe.
     animal: {
-        octaveShift: 0,
-        gapScale: 1,
-        tuneLength: [4, 6],
+        lowestOctave: 3,
+        rhythms: [1, 2, 3, 4, 5],
+        tuneLength: [3, 5],
         restChance: 0.15,
         noteLength: 0.22,
-        volume: -7,
+        volume: -12,
         motion: "hop",
         createSynth: () => new Tone.Synth({
             oscillator: {
@@ -97,14 +116,14 @@ const families = {
             }
         })
     },
-    // Fruits are slow ambient textures, so their notes come less often than the others'.
+    // Fruits are slow ambient textures, so they never play the quickest rhythms.
     fruit: {
-        octaveShift: 0,
-        gapScale: 1.7,
-        tuneLength: [3, 3],
+        lowestOctave: 3,
+        rhythms: [0, 1, 2, 3],
+        tuneLength: [2, 3],
         restChance: 0,
         noteLength: 1.2,
-        volume: -6,
+        volume: -15,
         motion: "swell",
         createSynth: () => new Tone.AMSynth({
             harmonicity: 2,
@@ -118,6 +137,25 @@ const families = {
     }
 };
 
+/*
+Every object has its own small set of rungs above the one its height picks, so each keeps a voice
+of its own: the bird runs up and down four neighbouring notes, the butterfly leaps, the snail
+stays close to home and the rake marks the chord's root and its octave. A tune only ever uses
+notes from its object's set.
+*/
+const noteSets = {
+    "garden-bird": [1, 2, 3, 4],
+    "garden-butterfly": [0, 2, 4],
+    "garden-snail": [-1, 0, 1],
+    "garden-rake": [0, 3],
+    "hand-trowel": [0, 1],
+    "watering-can": [0, 1, 2],
+    "flower-pot": [0, 2, 3],
+    "red-apple": [0, 2],
+    "green-pear": [1, 3],
+    strawberry: [0, 1, 2]
+};
+
 /* Garden objects ------------------------------------------------------------ */
 const gardenObjects = [...document.querySelectorAll(".gardenObject")].map(item => {
     const image = item.querySelector(".objectImage");
@@ -128,6 +166,14 @@ const gardenObjects = [...document.querySelectorAll(".gardenObject")].map(item =
     halo.className = "playHalo";
     button.prepend(halo);
 
+    // Until the object has played, a small note beside it says that it makes music.
+    const badge = document.createElement("img");
+    badge.className = "noteBadge";
+    badge.src = buttonSource("note-badge");
+    badge.alt = "";
+    badge.draggable = false;
+    button.append(badge);
+
     return {
         item,
         image,
@@ -135,11 +181,13 @@ const gardenObjects = [...document.querySelectorAll(".gardenObject")].map(item =
         halo,
         name: image.alt,
         family: families[item.dataset.category],
+        noteSet: noteSets[item.id] || [0, 1, 2],
         step: -1,
         tune: null,
         tuneIndex: 0,
-        clock: null,
+        lastNoteTime: 0,
         isPlaying: false,
+        hasPlayed: false,
         lastSlideNote: 0,
         dragEndedAt: 0,
         tappedAt: 0,
@@ -206,17 +254,22 @@ function readPlace(gardenObject) {
 }
 
 function findStep(gardenObject) {
-    return Math.round(readPlace(gardenObject).up * (scaleSteps - 1));
+    return Math.round(readPlace(gardenObject).up * (heightSteps - 1));
 }
 
-// The gap between notes in seconds. Each garden's tempo makes it a little calmer or livelier.
+function findRhythm(gardenObject) {
+    const choices = gardenObject.family.rhythms;
+    const index = Math.min(Math.floor(readPlace(gardenObject).across * choices.length), choices.length - 1);
+    return rhythms[choices[index]];
+}
+
+// The usual gap between notes in seconds, which keeps each movement shorter than the next note.
 function findGap(gardenObject) {
-    const { across } = readPlace(gardenObject);
-    const gap = slowestGap * (fastestGap / slowestGap) ** across;
-    return gap * gardenObject.family.gapScale * 84 / gardenTempo;
+    const { cycle, hits } = findRhythm(gardenObject);
+    return cycle / hits.length * 60 / gardenTempo / 4;
 }
 
-// Returns true when the object has moved to a different step of the scale.
+// Returns true when the object has moved to a different rung of the ladder.
 function updatePlace(gardenObject) {
     const step = findStep(gardenObject);
     const stepChanged = step !== gardenObject.step;
@@ -226,13 +279,10 @@ function updatePlace(gardenObject) {
     const depth = Math.round(readPosition(gardenObject).y);
     gardenObject.item.style.setProperty("--depth", String(depth));
 
-    // Gentle panning follows the object across the garden, and a playing object changes speed.
+    // Gentle panning follows the object across the garden.
     if (gardenObject.voice) {
         const pan = (readPlace(gardenObject).across * 2 - 1) * 0.6;
         gardenObject.voice.panner.pan.rampTo(pan, 0.1);
-    }
-    if (gardenObject.clock) {
-        gardenObject.clock.frequency.value = 1 / findGap(gardenObject);
     }
 
     return stepChanged;
@@ -282,8 +332,14 @@ function buildGardenOutput() {
     // A little shared reverb places every object in the same garden.
     gardenOutput = new Tone.Reverb({
         decay: 2.5,
-        wet: 0.22
+        wet: 0.25
     }).connect(limiter);
+
+    // One beat for the whole garden, at the garden's own tempo, keeps every object in time.
+    const transport = Tone.getTransport();
+    transport.bpm.value = gardenTempo;
+    transport.scheduleRepeat(playBeat, "16n");
+    transport.start("+0.05");
 }
 
 function getVoice(gardenObject) {
@@ -302,49 +358,60 @@ function getVoice(gardenObject) {
 }
 
 /*
-Controlled randomness, extended: every tap makes a new short tune for the object, a few steps up
-and down the scale from the note its height picks. The tune repeats, so a child can hear it as
-the object's own song, but each time round one note may move a step, so it never quite repeats.
-Moving the object carries the whole tune higher or lower.
+Controlled randomness, extended: every tap makes a new short tune for the object, picked from its
+own set of notes. The tune repeats, so a child can hear it as the object's own song, but each time
+round one note may swap for another from the set, so it never quite repeats. Moving the object
+carries the whole tune higher or lower, and the chords underneath give the same tune a new colour
+every two bars.
 */
-function makeTune(family) {
+function pickFrom(list) {
+    return list[Math.floor(Math.random() * list.length)];
+}
+
+function makeTune(gardenObject) {
+    const { family, noteSet } = gardenObject;
     const [shortest, longest] = family.tuneLength;
     const length = shortest + Math.floor(Math.random() * (longest - shortest + 1));
-    const tune = [0];
-    let last = 0;
+    const tune = [pickFrom(noteSet)];
 
     while (tune.length < length) {
         if (Math.random() < family.restChance) {
             tune.push(null);
         } else {
-            const leap = [-2, -1, 1, 2, 3][Math.floor(Math.random() * 5)];
-            last = clamp(last + leap, -3, 5);
-            tune.push(last);
+            // A different note from the last one keeps even a short tune moving.
+            const choices = noteSet.filter(rung => rung !== tune[tune.length - 1]);
+            tune.push(pickFrom(choices.length ? choices : noteSet));
         }
     }
     return tune;
 }
 
-function varyTune(tune) {
+function varyTune(gardenObject) {
+    const { tune, noteSet } = gardenObject;
     if (Math.random() > 0.4) return;
 
     const index = 1 + Math.floor(Math.random() * (tune.length - 1));
     if (tune[index] === null) return;
-    tune[index] = clamp(tune[index] + (Math.random() < 0.5 ? -1 : 1), -3, 5);
+    tune[index] = pickFrom(noteSet);
 }
 
-// Turns a step of the scale into a MIDI note in the garden's key.
-function noteForStep(gardenObject, step) {
-    const safeStep = clamp(step, 0, scaleSteps + 4);
-    const octave = lowestOctave + gardenObject.family.octaveShift + Math.floor(safeStep / 5);
-    return Tone.Frequency(`${gardenKey}${octave}`).toMidi() + pentatonicSteps[safeStep % 5];
+// Sixteenths since the garden's sound started, counted by the shared beat.
+let beat = 0;
+
+// Turns a rung of the chord ladder into a MIDI note, for the chord playing at that beat.
+function noteForRung(gardenObject, rung, atBeat = beat) {
+    const chord = chordRound[Math.floor(atBeat / (beatsPerBar * barsPerChord)) % chordRound.length];
+    const safeRung = Math.max(rung, 0);
+    const root = Tone.Frequency(`${gardenKey}${gardenObject.family.lowestOctave}`).toMidi();
+    return root + 12 * Math.floor(safeRung / 3) + chord[safeRung % 3];
 }
 
 function playNote(gardenObject, time, velocity, note) {
     const { synth } = getVoice(gardenObject);
     // Low notes get a bounded boost so they stay audible on small speakers.
-    const volume = gardenObject.family.volume + (1 - readPlace(gardenObject).up) * 4;
+    const volume = gardenObject.family.volume + (1 - readPlace(gardenObject).up) * 3;
 
+    gardenObject.lastNoteTime = time;
     synth.volume.setValueAtTime(volume, time);
     synth.triggerAttackRelease(Tone.Frequency(note, "midi").toNote(),
         gardenObject.family.noteLength, time, velocity);
@@ -353,44 +420,54 @@ function playNote(gardenObject, time, velocity, note) {
     Tone.getDraw().schedule(() => moveWithNote(gardenObject), time);
 }
 
-function playNextNote(gardenObject, time, velocity) {
+function playNextNote(gardenObject, time, velocity, atBeat) {
     const { tune } = gardenObject;
 
     if (gardenObject.tuneIndex >= tune.length) {
         gardenObject.tuneIndex = 0;
-        varyTune(tune);
+        varyTune(gardenObject);
     }
 
-    const offset = tune[gardenObject.tuneIndex];
+    const rung = tune[gardenObject.tuneIndex];
     gardenObject.tuneIndex += 1;
-    if (offset === null) return;
+    if (rung === null) return;
 
-    playNote(gardenObject, time, velocity, noteForStep(gardenObject, findStep(gardenObject) + offset));
+    playNote(gardenObject, time, velocity,
+        noteForRung(gardenObject, findStep(gardenObject) + rung, atBeat));
 }
 
-// A playing object keeps its own clock, so its speed can follow it smoothly across the garden.
-function startPlaying(gardenObject) {
-    gardenObject.tune = makeTune(gardenObject.family);
+// On every sixteenth, each playing object checks whether its rhythm has a note there.
+function playBeat(time) {
+    const thisBeat = beat;
+    beat += 1;
+
+    gardenObjects.forEach(gardenObject => {
+        if (!gardenObject.isPlaying) return;
+
+        const { cycle, hits } = findRhythm(gardenObject);
+        if (!hits.includes(thisBeat % cycle)) return;
+        // A tap's first note may have only just sounded, so the beat does not double it.
+        if (time - gardenObject.lastNoteTime < 0.12) return;
+
+        // The first beat of each bar is a little stronger, and small changes keep it organic.
+        const accent = thisBeat % beatsPerBar === 0 ? 0.1 : 0;
+        playNextNote(gardenObject, time, 0.55 + accent + Math.random() * 0.15, thisBeat);
+    });
+}
+
+// A tapped object sings its first note at once; when the whole garden joins in, it waits for
+// its next beat, so the objects come in together.
+function startPlaying(gardenObject, startNow = true) {
+    gardenObject.tune = makeTune(gardenObject);
     gardenObject.tuneIndex = 0;
+    gardenObject.hasPlayed = true;
+    gardenObject.item.classList.add("hasPlayed");
     setPlaying(gardenObject, true);
 
-    // The first note sounds at once, so a single tap is enough to hear the object begin.
-    playNextNote(gardenObject, Tone.immediate() + 0.02, 0.7);
-
-    const gap = findGap(gardenObject);
-    gardenObject.clock = new Tone.Clock(time => {
-        // Small velocity changes keep each repeating tune sounding organic, as in Prototype 3.
-        playNextNote(gardenObject, time, 0.5 + Math.random() * 0.18);
-    }, 1 / gap);
-    gardenObject.clock.start(Tone.now() + gap);
+    if (startNow) playNextNote(gardenObject, Tone.immediate() + 0.02, 0.7);
 }
 
 function stopPlaying(gardenObject) {
-    if (gardenObject.clock) {
-        gardenObject.clock.stop();
-        gardenObject.clock.dispose();
-        gardenObject.clock = null;
-    }
     setPlaying(gardenObject, false);
 }
 
@@ -446,12 +523,12 @@ function moveWithNote(gardenObject) {
     floatNote(x, y - readHeight(gardenObject));
 }
 
-// A small, translucent pulse marks each note without covering the garden artwork.
+// The halo swells with each note, so the pulse matches the sound.
 function pulseHalo(halo, duration) {
     halo.animate([
-        { scale: 1, opacity: 0.28 },
-        { scale: 1.08, opacity: 0.42 },
-        { scale: 1, opacity: 0.28 }
+        { scale: 1, opacity: 0.4 },
+        { scale: 1.12, opacity: 0.55 },
+        { scale: 1, opacity: 0.4 }
     ], {
         duration: Math.max(duration, 260),
         easing: "ease-out"
@@ -511,7 +588,6 @@ function addRipple(x, y, width) {
 
 /* Tapping ------------------------------------------------------------------- */
 let joinTimers = [];
-let playbackRequest = null;
 
 function hasPlayingObject() {
     return gardenObjects.some(gardenObject => gardenObject.isPlaying);
@@ -530,19 +606,16 @@ the whole garden join in, one object after another in a new random order each ti
 anything plays it shows pause, and a press stops every sound.
 */
 function updateQuietButton() {
-    const isBusy = hasPlayingObject() || joinTimers.length > 0 || playbackRequest !== null;
+    const isBusy = hasPlayingObject() || joinTimers.length > 0;
     const key = isBusy ? "quiet" : "resume";
     const [raised, flat] = quietButton.querySelectorAll("img");
 
     raised.src = buttonSource(`${key}-raised`);
     flat.src = buttonSource(key);
-    const playLabel = guide ? `Play the ${guide.target.name.toLowerCase()}` : "Play the whole garden";
-    raised.alt = isBusy ? "Stop all sounds" : playLabel;
+    raised.alt = isBusy ? "Stop all sounds" : "Play the whole garden";
 }
 
 function stopGarden() {
-    // A second press also cancels a start that is still waiting for audio permission.
-    playbackRequest = null;
     joinTimers.forEach(timer => clearTimeout(timer));
     joinTimers = [];
 
@@ -556,58 +629,30 @@ function stopGarden() {
 }
 
 async function playGarden() {
-    const request = { guide };
-    playbackRequest = request;
-    updateQuietButton();
-    let canPlay = false;
+    if (!(await prepareAudio())) return;
 
-    try {
-        canPlay = await prepareAudio() && playbackRequest === request && guide === request.guide;
-    } finally {
-        if (playbackRequest === request) {
-            playbackRequest = null;
+    const order = [...gardenObjects].sort(() => Math.random() - 0.5);
+    let delay = 0;
+
+    order.forEach(gardenObject => {
+        const timer = setTimeout(() => {
+            joinTimers = joinTimers.filter(waiting => waiting !== timer);
+            if (!gardenObject.isPlaying) {
+                startPlaying(gardenObject, false);
+                glowObject(gardenObject);
+            }
             updateQuietButton();
-        }
-    }
-    if (!canPlay) return;
+        }, delay);
 
-    // During the guide, play resumes its highlighted object without starting the other objects.
-    if (request.guide) {
-        const target = request.guide.target;
-        if (!target.isPlaying) startPlaying(target);
-        glowObject(target);
-        announce(`${target.name} is singing ${describePlace(target)}.`);
-        return;
-    }
-
-    const order = [...gardenObjects];
-    for (let index = order.length - 1; index > 0; index -= 1) {
-        const otherIndex = Math.floor(Math.random() * (index + 1));
-        [order[index], order[otherIndex]] = [order[otherIndex], order[index]];
-    }
-
-    // Schedule only the next arrival, so a busy page cannot release a batch of overdue starts.
-    function startNextObject() {
-        joinTimers = [];
-        const gardenObject = order.shift();
-        if (!gardenObject.isPlaying) {
-            startPlaying(gardenObject);
-            glowObject(gardenObject);
-        }
-
-        if (order.length > 0) {
-            const delay = 500 + Math.random() * 500;
-            joinTimers.push(setTimeout(startNextObject, delay));
-        }
-        updateQuietButton();
-    }
-
-    startNextObject();
-    announce("The garden is joining in, one object at a time.");
+        joinTimers.push(timer);
+        delay += 500 + Math.random() * 600;
+    });
+    updateQuietButton();
+    announce("The whole garden is playing.");
 }
 
 function playOrStopGarden() {
-    if (hasPlayingObject() || joinTimers.length > 0 || playbackRequest !== null) {
+    if (hasPlayingObject() || joinTimers.length > 0) {
         stopGarden();
     } else {
         playGarden();
@@ -621,7 +666,7 @@ async function toggleObject(gardenObject) {
         // A stop still sounds: one quiet note from where the object rests.
         stopPlaying(gardenObject);
         playNote(gardenObject, Tone.immediate() + 0.02, 0.35,
-            noteForStep(gardenObject, findStep(gardenObject)));
+            noteForRung(gardenObject, findStep(gardenObject)));
         announce(`${gardenObject.name} stopped.`);
     } else {
         startPlaying(gardenObject);
@@ -672,14 +717,14 @@ function moveDrag(gardenObject, event) {
     const y = (event.clientY - drag.offsetY - sceneBounds.top) / sceneBounds.height * 100;
     placeObject(gardenObject, x, y);
 
-    // A resting object sounds each step of the scale it passes, like a finger along a xylophone.
+    // A resting object sounds each rung it passes, like a finger along a xylophone.
     const stepChanged = updatePlace(gardenObject);
     const now = performance.now();
     if (stepChanged && !gardenObject.isPlaying && audioIsRunning()
         && now - gardenObject.lastSlideNote > 70) {
         gardenObject.lastSlideNote = now;
         playNote(gardenObject, Tone.immediate() + 0.02, 0.4,
-            noteForStep(gardenObject, gardenObject.step));
+            noteForRung(gardenObject, gardenObject.step));
     }
 }
 
@@ -749,8 +794,10 @@ function handleKey(gardenObject, event) {
 Testers watched the old demonstration but still did not know what to do, so the guide is now
 played along with. The rest of the garden dims and a hand taps on one animal with "Tap here".
 Once the child taps it, the animal keeps singing and the hand shows dragging it up or down, then
-left or right, waiting each time until the child has tried. The help button starts it, it starts
-by itself on a first visit, and the cross or Escape ends it at any time.
+to the right, to an arrow. Each step passes as soon as the animal comes most of the way to the
+arrow, even while the finger is still down, so a child never has to push it to the window's edge.
+It starts by itself every time a garden opens, the help button starts it again, and the cross or
+Escape ends it at any time.
 */
 const guideBox = document.querySelector(".guide");
 const guideSpot = guideBox.querySelector(".guideSpot");
@@ -760,7 +807,7 @@ const guideTitle = guideBox.querySelector(".guideTitle");
 const guideHint = guideBox.querySelector(".guideHint");
 const guideLabel = guideBox.querySelector(".guideLabel");
 const guideClose = guideBox.querySelector(".guideClose");
-const guideMove = 0.15;
+const guideReach = 0.7;
 let guide = null;
 
 function wait(milliseconds) {
@@ -771,7 +818,7 @@ function wait(milliseconds) {
 async function waitUntil(currentGuide, check) {
     while (guide === currentGuide) {
         if (check()) return true;
-        await wait(150);
+        await wait(100);
     }
     return false;
 }
@@ -783,7 +830,7 @@ function showGuideStep(step, title, hint) {
     announce(`${title} ${hint}`);
 }
 
-// The spotlight, hand and words follow the object; the arrow stays at the step's destination.
+// The spotlight, hand, arrow and words follow the object, even while it is being dragged.
 function placeGuide() {
     if (!guide) return;
 
@@ -791,11 +838,16 @@ function placeGuide() {
     const x = (box.left + box.right) / 2;
     const y = (box.top + box.bottom) / 2;
     const radius = Math.max(box.width, box.height) * 0.62 + 18;
-    const moveY = Number(guideBox.style.getPropertyValue("--moveY").replace("px", "")) || 0;
 
     guideBox.style.setProperty("--spotX", `${x}px`);
     guideBox.style.setProperty("--spotY", `${y}px`);
     guideBox.style.setProperty("--spotSize", `${radius * 2}px`);
+
+    // The arrow stays where it was put, as a place to drag to, and the hand always heads for it.
+    const moveX = guide.arrow ? (guide.arrow.x - x) * 0.8 : 0;
+    const moveY = guide.arrow ? (guide.arrow.y - y) * 0.8 : 0;
+    guideBox.style.setProperty("--moveX", `${moveX}px`);
+    guideBox.style.setProperty("--moveY", `${moveY}px`);
 
     // The words sit under the spotlight, out of the drag's way, or above it when there is no room.
     const labelHeight = guideLabel.offsetHeight;
@@ -810,31 +862,49 @@ function placeGuide() {
     requestAnimationFrame(placeGuide);
 }
 
-// The hand shows a drag towards whichever side has more room.
+function findCentre(gardenObject) {
+    const box = gardenObject.item.getBoundingClientRect();
+    return {
+        x: (box.left + box.right) / 2,
+        y: (box.top + box.bottom) / 2
+    };
+}
+
+// The arrow is placed once and stays there while the child drags.
 function pointGuide(direction) {
-    const { across, up } = readPlace(guide.target);
+    const { up } = readPlace(guide.target);
+    const centre = findCentre(guide.target);
+    const margin = guideArrow.offsetWidth / 2 + 12 || 60;
     let moveX = 0;
     let moveY = 0;
 
+    // Up or down goes where there is more room. Across always goes right, towards quicker
+    // notes, since a child hears a speed-up at once but has to wait to notice a slow-down.
     if (direction === "up") {
-        moveY = (up < 0.5 ? -1 : 1) * window.innerHeight * 0.22;
+        moveY = (up < 0.5 ? -1 : 1) * window.innerHeight * 0.28;
     } else {
-        moveX = (across < 0.5 ? 1 : -1) * window.innerWidth * 0.22;
+        moveX = window.innerWidth * 0.28;
     }
-    guideBox.style.setProperty("--moveX", `${moveX}px`);
-    guideBox.style.setProperty("--moveY", `${moveY}px`);
-
-    // Fix the destination when the step begins, so dragging cannot move the target away.
-    const box = guide.target.item.getBoundingClientRect();
-    const edge = parseFloat(getComputedStyle(guideArrow).width) / 2 + 8;
-    const arrowX = clamp((box.left + box.right) / 2 + moveX * 1.4, edge, window.innerWidth - edge);
-    const arrowY = clamp((box.top + box.bottom) / 2 + moveY * 1.4, edge, window.innerHeight - edge);
-    guideArrow.style.setProperty("--arrowX", `${arrowX}px`);
-    guideArrow.style.setProperty("--arrowY", `${arrowY}px`);
+    guide.start = centre;
+    guide.arrow = {
+        x: clamp(centre.x + moveX, margin, window.innerWidth - margin),
+        y: clamp(centre.y + moveY, margin, window.innerHeight - margin)
+    };
+    guideArrow.style.setProperty("--arrowX", `${guide.arrow.x}px`);
+    guideArrow.style.setProperty("--arrowY", `${guide.arrow.y}px`);
 
     guideArrow.src = buttonSource(direction === "up" ? "arrow-up" : "arrow-right");
     guideArrow.style.setProperty("--arrowTurn", moveY > 0 || moveX < 0 ? "180deg" : "0deg");
     return moveY < 0 || moveX > 0;
+}
+
+// True once the object has come most of the way from where the step began to the arrow.
+function hasReachedArrow(axis) {
+    const distance = guide.arrow[axis] - guide.start[axis];
+    const travelled = findCentre(guide.target)[axis] - guide.start[axis];
+    // An animal already at the edge has nowhere to go, so a small move that way is enough.
+    if (Math.abs(distance) < 40) return Math.sign(travelled) === Math.sign(distance) && Math.abs(travelled) > 10;
+    return travelled / distance >= guideReach;
 }
 
 async function runGuide() {
@@ -846,55 +916,45 @@ async function runGuide() {
     helpButton.setAttribute("aria-pressed", "true");
     document.body.classList.add("isGuiding");
     target.item.classList.add("isGuideTarget");
-    // Clear whole-garden starts so only the highlighted object plays during the guide.
-    stopGarden();
+    if (target.isPlaying) stopPlaying(target);
     guideBox.hidden = false;
-    guideBox.style.setProperty("--moveX", "0px");
-    guideBox.style.setProperty("--moveY", "0px");
+    // A mouse click on the help key should not leave a focus ring on it under the shade.
+    helpButton.blur();
     placeGuide();
 
     // Tap: the hand taps on the animal until the child taps it too.
-    showGuideStep("tap", "Tap here!", `The ${target.name.toLowerCase()} sings again and again.`);
+    showGuideStep("tap", "Tap here!", `Every object plays music. The ${target.name.toLowerCase()} sings again and again.`);
     if (!(await waitUntil(currentGuide, () => target.isPlaying))) return;
-    await wait(1200);
-    if (guide !== currentGuide) return;
+    await wait(900);
 
-    // Up and down: wait until the child has moved it a fair way, and let go.
-    const startUp = readPlace(target).up;
+    // Up and down: the step passes once the animal reaches the arrow.
     const goesUp = pointGuide("up");
     showGuideStep("up", goesUp ? "Drag it up!" : "Drag it down!",
         goesUp ? "Higher up sings higher notes." : "Lower down sings lower notes.");
-    if (!(await waitUntil(currentGuide,
-        () => Math.abs(readPlace(target).up - startUp) > guideMove && !target.drag))) return;
-    await wait(1200);
-    if (guide !== currentGuide) return;
+    if (!(await waitUntil(currentGuide, () => hasReachedArrow("y")))) return;
+    await wait(600);
 
-    // Left and right, in the same way.
-    const startAcross = readPlace(target).across;
-    const goesRight = pointGuide("across");
-    showGuideStep("across", goesRight ? "Drag it right!" : "Drag it left!",
-        goesRight ? "Further right plays faster." : "Further left plays slower.");
-    if (!(await waitUntil(currentGuide,
-        () => Math.abs(readPlace(target).across - startAcross) > guideMove && !target.drag))) return;
-    await wait(1200);
-    if (guide !== currentGuide) return;
+    // Then to the right, in the same way.
+    pointGuide("across");
+    showGuideStep("across", "Drag it right!", "Further right plays faster.");
+    if (!(await waitUntil(currentGuide, () => hasReachedArrow("x")))) return;
+    await wait(600);
 
-    showGuideStep("done", "Your turn!", "Tap any object, or the play button for the whole garden.");
-    await wait(3000);
+    guide.arrow = null;
+    showGuideStep("done", "Your turn!", "Tap more objects to make music together, or the play button for the whole garden.");
+    await wait(3500);
     if (guide === currentGuide) endGuide();
 }
 
 function endGuide() {
     if (!guide) return;
 
-    if (playbackRequest?.guide === guide) playbackRequest = null;
     guide.target.item.classList.remove("isGuideTarget");
     guide = null;
     guideBox.hidden = true;
     delete guideBox.dataset.step;
     document.body.classList.remove("isGuiding");
     helpButton.setAttribute("aria-pressed", "false");
-    updateQuietButton();
     lastActivity = performance.now();
 }
 
@@ -962,11 +1022,10 @@ document.addEventListener("keydown", event => {
     if (event.key === "Escape") endGuide();
 });
 
-// Any touch or key counts as play, which holds back the hints and the first-visit guide.
+// Any touch or key counts as play, which holds back the hints.
 ["pointerdown", "keydown"].forEach(type => {
     document.addEventListener(type, () => {
         lastActivity = performance.now();
-        clearTimeout(firstVisitGuide);
     });
 });
 
@@ -979,16 +1038,16 @@ setInterval(() => {
     }
 }, 5000);
 
-// The guide starts by itself once per visit, after the wiggle, unless the child has already begun.
-let firstVisitGuide;
-try {
-    if (!sessionStorage.getItem("gardenGuideShown")) {
-        sessionStorage.setItem("gardenGuideShown", "yes");
-        firstVisitGuide = setTimeout(runGuide, 1600);
+// The guide starts by itself every time a garden opens, just after the wiggle. If a finger is
+// already carrying an object, it waits until the object is put down.
+function startGuideOnEntry() {
+    if (gardenObjects.some(gardenObject => gardenObject.drag)) {
+        setTimeout(startGuideOnEntry, 300);
+    } else {
+        runGuide();
     }
-} catch {
-    // Without storage the guide simply waits for the help button.
 }
+setTimeout(startGuideOnEntry, 1400);
 
 // A tap on the garden picture itself answers with a small ripple, so every touch gets feedback.
 gardenStage.addEventListener("pointerdown", event => {
