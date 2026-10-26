@@ -411,7 +411,7 @@ the object's own outline instead of a circle, and its colour comes from the gard
 
 .objectButton::after {
     position: absolute;
-    inset: -15%;
+    inset: -6%;
     z-index: -1;
     border-radius: 50%;
     background: radial-gradient(closest-side, var(--glowCore) 0%, var(--glowColour) 45%,
@@ -435,13 +435,13 @@ the object's own outline instead of a circle, and its colour comes from the gard
 
     10%,
     30% {
-        filter: brightness(1.15) saturate(1.35) drop-shadow(0 0 0.2rem var(--glowCore))
-            drop-shadow(0 0 0.8rem var(--glowColour));
+        filter: brightness(1.06) saturate(1.1) drop-shadow(0 0 0.1rem var(--glowCore))
+            drop-shadow(0 0 0.35rem var(--glowColour));
     }
 
     60% {
-        filter: brightness(1.07) saturate(1.15) drop-shadow(0 0 0.1rem var(--glowCore))
-            drop-shadow(0 0 1.2rem var(--glowColour));
+        filter: brightness(1.03) saturate(1.05) drop-shadow(0 0 0.05rem var(--glowCore))
+            drop-shadow(0 0 0.5rem var(--glowColour));
     }
 }
 
@@ -453,25 +453,25 @@ the object's own outline instead of a circle, and its colour comes from the gard
     }
 
     15% {
-        opacity: 0.85;
+        opacity: 0.35;
     }
 
     100% {
         opacity: 0;
-        scale: 1.5;
+        scale: 1.15;
     }
 }
 
 /* Playing state */
 
 /*
-A playing object keeps a soft halo in the garden's colour behind it, so a child can see at a
+A playing object keeps a small, translucent halo in the garden's colour, so a child can see at a
 glance which objects are making music. garden.js makes the halo pulse with every note and lets a
 small note float up from the object.
 */
 .playHalo {
     position: absolute;
-    inset: -30%;
+    inset: -12%;
     z-index: -2;
     border-radius: 50%;
     background: radial-gradient(closest-side, rgb(255 255 255 / 95%) 0%, var(--glowCore) 35%,
@@ -482,7 +482,7 @@ small note float up from the object.
 }
 
 .gardenObject.isPlaying .playHalo {
-    opacity: 0.8;
+    opacity: 0.28;
 }
 
 .noteLayer {
@@ -522,7 +522,7 @@ small note float up from the object.
 
 /*
 The guide covers the window. A dark shade with a round hole lights up the one object to play
-with, and only that object, the guide's words and its cross can be pressed. A hand taps on the
+with. The play/stop key remains available to control the highlighted object. A hand taps on the
 object, then shows a drag up or down and left or right, with an arrow where the drag ends.
 */
 .guide {
@@ -676,11 +676,27 @@ object, then shows a drag up or down and left or right, with an arrow where the 
     pointer-events: auto;
 }
 
+/* The guide's close key replaces Help in the same slot, so their pictures never overlap. */
+.isGuiding .helpButton {
+    visibility: hidden;
+}
+
+@media (max-width: 22rem) {
+    .guideClose {
+        top: calc(1.5rem + var(--navButtonSize));
+    }
+}
+
 /* While the guide runs, only the lit object can be played. */
 .isGuiding .storyNav,
 .isGuiding .gardenTools,
 .isGuiding .gardenObject:not(.isGuideTarget) {
     pointer-events: none;
+}
+
+/* The visible play/stop key remains usable while the guide blocks the other controls. */
+.isGuiding .quietButton {
+    pointer-events: auto;
 }
 
 /* Turning the phone */

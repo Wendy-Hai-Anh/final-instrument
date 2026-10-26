@@ -446,12 +446,12 @@ function moveWithNote(gardenObject) {
     floatNote(x, y - readHeight(gardenObject));
 }
 
-// The halo swells with each note, so the pulse matches the sound.
+// A small, translucent pulse marks each note without covering the garden artwork.
 function pulseHalo(halo, duration) {
     halo.animate([
-        { scale: 1, opacity: 0.8 },
-        { scale: 1.25, opacity: 1 },
-        { scale: 1, opacity: 0.8 }
+        { scale: 1, opacity: 0.28 },
+        { scale: 1.08, opacity: 0.42 },
+        { scale: 1, opacity: 0.28 }
     ], {
         duration: Math.max(duration, 260),
         easing: "ease-out"
@@ -511,6 +511,7 @@ function addRipple(x, y, width) {
 
 /* Tapping ------------------------------------------------------------------- */
 let joinTimers = [];
+let playbackRequest = null;
 
 function hasPlayingObject() {
     return gardenObjects.some(gardenObject => gardenObject.isPlaying);
@@ -529,16 +530,19 @@ the whole garden join in, one object after another in a new random order each ti
 anything plays it shows pause, and a press stops every sound.
 */
 function updateQuietButton() {
-    const isBusy = hasPlayingObject() || joinTimers.length > 0;
+    const isBusy = hasPlayingObject() || joinTimers.length > 0 || playbackRequest !== null;
     const key = isBusy ? "quiet" : "resume";
     const [raised, flat] = quietButton.querySelectorAll("img");
 
     raised.src = buttonSource(`${key}-raised`);
     flat.src = buttonSource(key);
-    raised.alt = isBusy ? "Stop all sounds" : "Play the whole garden";
+    const playLabel = guide ? `Play the ${guide.target.name.toLowerCase()}` : "Play the whole garden";
+    raised.alt = isBusy ? "Stop all sounds" : playLabel;
 }
 
 function stopGarden() {
+    // A second press also cancels a start that is still waiting for audio permission.
+    playbackRequest = null;
     joinTimers.forEach(timer => clearTimeout(timer));
     joinTimers = [];
 
@@ -552,30 +556,58 @@ function stopGarden() {
 }
 
 async function playGarden() {
-    if (!(await prepareAudio())) return;
-
-    const order = [...gardenObjects].sort(() => Math.random() - 0.5);
-    let delay = 0;
-
-    order.forEach(gardenObject => {
-        const timer = setTimeout(() => {
-            joinTimers = joinTimers.filter(waiting => waiting !== timer);
-            if (!gardenObject.isPlaying) {
-                startPlaying(gardenObject);
-                glowObject(gardenObject);
-            }
-            updateQuietButton();
-        }, delay);
-
-        joinTimers.push(timer);
-        delay += 500 + Math.random() * 600;
-    });
+    const request = { guide };
+    playbackRequest = request;
     updateQuietButton();
-    announce("The whole garden is playing.");
+    let canPlay = false;
+
+    try {
+        canPlay = await prepareAudio() && playbackRequest === request && guide === request.guide;
+    } finally {
+        if (playbackRequest === request) {
+            playbackRequest = null;
+            updateQuietButton();
+        }
+    }
+    if (!canPlay) return;
+
+    // During the guide, play resumes its highlighted object without starting the other objects.
+    if (request.guide) {
+        const target = request.guide.target;
+        if (!target.isPlaying) startPlaying(target);
+        glowObject(target);
+        announce(`${target.name} is singing ${describePlace(target)}.`);
+        return;
+    }
+
+    const order = [...gardenObjects];
+    for (let index = order.length - 1; index > 0; index -= 1) {
+        const otherIndex = Math.floor(Math.random() * (index + 1));
+        [order[index], order[otherIndex]] = [order[otherIndex], order[index]];
+    }
+
+    // Schedule only the next arrival, so a busy page cannot release a batch of overdue starts.
+    function startNextObject() {
+        joinTimers = [];
+        const gardenObject = order.shift();
+        if (!gardenObject.isPlaying) {
+            startPlaying(gardenObject);
+            glowObject(gardenObject);
+        }
+
+        if (order.length > 0) {
+            const delay = 500 + Math.random() * 500;
+            joinTimers.push(setTimeout(startNextObject, delay));
+        }
+        updateQuietButton();
+    }
+
+    startNextObject();
+    announce("The garden is joining in, one object at a time.");
 }
 
 function playOrStopGarden() {
-    if (hasPlayingObject() || joinTimers.length > 0) {
+    if (hasPlayingObject() || joinTimers.length > 0 || playbackRequest !== null) {
         stopGarden();
     } else {
         playGarden();
@@ -751,7 +783,7 @@ function showGuideStep(step, title, hint) {
     announce(`${title} ${hint}`);
 }
 
-// The spotlight, hand, arrow and words follow the object, even while it is being dragged.
+// The spotlight, hand and words follow the object; the arrow stays at the step's destination.
 function placeGuide() {
     if (!guide) return;
 
@@ -759,15 +791,11 @@ function placeGuide() {
     const x = (box.left + box.right) / 2;
     const y = (box.top + box.bottom) / 2;
     const radius = Math.max(box.width, box.height) * 0.62 + 18;
-    const moveX = Number(guideBox.style.getPropertyValue("--moveX").replace("px", "")) || 0;
     const moveY = Number(guideBox.style.getPropertyValue("--moveY").replace("px", "")) || 0;
 
     guideBox.style.setProperty("--spotX", `${x}px`);
     guideBox.style.setProperty("--spotY", `${y}px`);
     guideBox.style.setProperty("--spotSize", `${radius * 2}px`);
-    // The arrow waits just past where the hand's drag ends.
-    guideArrow.style.setProperty("--arrowX", `${x + moveX * 1.4}px`);
-    guideArrow.style.setProperty("--arrowY", `${y + moveY * 1.4}px`);
 
     // The words sit under the spotlight, out of the drag's way, or above it when there is no room.
     const labelHeight = guideLabel.offsetHeight;
@@ -796,6 +824,14 @@ function pointGuide(direction) {
     guideBox.style.setProperty("--moveX", `${moveX}px`);
     guideBox.style.setProperty("--moveY", `${moveY}px`);
 
+    // Fix the destination when the step begins, so dragging cannot move the target away.
+    const box = guide.target.item.getBoundingClientRect();
+    const edge = parseFloat(getComputedStyle(guideArrow).width) / 2 + 8;
+    const arrowX = clamp((box.left + box.right) / 2 + moveX * 1.4, edge, window.innerWidth - edge);
+    const arrowY = clamp((box.top + box.bottom) / 2 + moveY * 1.4, edge, window.innerHeight - edge);
+    guideArrow.style.setProperty("--arrowX", `${arrowX}px`);
+    guideArrow.style.setProperty("--arrowY", `${arrowY}px`);
+
     guideArrow.src = buttonSource(direction === "up" ? "arrow-up" : "arrow-right");
     guideArrow.style.setProperty("--arrowTurn", moveY > 0 || moveX < 0 ? "180deg" : "0deg");
     return moveY < 0 || moveX > 0;
@@ -810,7 +846,8 @@ async function runGuide() {
     helpButton.setAttribute("aria-pressed", "true");
     document.body.classList.add("isGuiding");
     target.item.classList.add("isGuideTarget");
-    if (target.isPlaying) stopPlaying(target);
+    // Clear whole-garden starts so only the highlighted object plays during the guide.
+    stopGarden();
     guideBox.hidden = false;
     guideBox.style.setProperty("--moveX", "0px");
     guideBox.style.setProperty("--moveY", "0px");
@@ -820,6 +857,7 @@ async function runGuide() {
     showGuideStep("tap", "Tap here!", `The ${target.name.toLowerCase()} sings again and again.`);
     if (!(await waitUntil(currentGuide, () => target.isPlaying))) return;
     await wait(1200);
+    if (guide !== currentGuide) return;
 
     // Up and down: wait until the child has moved it a fair way, and let go.
     const startUp = readPlace(target).up;
@@ -829,6 +867,7 @@ async function runGuide() {
     if (!(await waitUntil(currentGuide,
         () => Math.abs(readPlace(target).up - startUp) > guideMove && !target.drag))) return;
     await wait(1200);
+    if (guide !== currentGuide) return;
 
     // Left and right, in the same way.
     const startAcross = readPlace(target).across;
@@ -838,6 +877,7 @@ async function runGuide() {
     if (!(await waitUntil(currentGuide,
         () => Math.abs(readPlace(target).across - startAcross) > guideMove && !target.drag))) return;
     await wait(1200);
+    if (guide !== currentGuide) return;
 
     showGuideStep("done", "Your turn!", "Tap any object, or the play button for the whole garden.");
     await wait(3000);
@@ -847,12 +887,14 @@ async function runGuide() {
 function endGuide() {
     if (!guide) return;
 
+    if (playbackRequest?.guide === guide) playbackRequest = null;
     guide.target.item.classList.remove("isGuideTarget");
     guide = null;
     guideBox.hidden = true;
     delete guideBox.dataset.step;
     document.body.classList.remove("isGuiding");
     helpButton.setAttribute("aria-pressed", "false");
+    updateQuietButton();
     lastActivity = performance.now();
 }
 
