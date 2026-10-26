@@ -104,7 +104,7 @@ The mapping and feedback come from peer testing of the eight Assignment 2 protot
   down, then to the right, to an arrow that stays in place; right rather than left, because a
   speed-up is heard at once while a slow-down takes a while to notice. Each step passes as soon
   as the animal comes most of the way to its arrow, even before the finger lifts. It starts by
-  itself every time a garden opens, and the cross or Escape ends it.
+  itself once across all gardens in the same browser, and the cross or Escape ends it.
 - **One look.** The orchard and meadow objects have their outlines softened towards each
   garden's own deep colour, so they sit in those painterly pictures as the lakeside objects sit
   in its outlined one.

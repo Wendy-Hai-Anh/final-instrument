@@ -796,7 +796,7 @@ played along with. The rest of the garden dims and a hand taps on one animal wit
 Once the child taps it, the animal keeps singing and the hand shows dragging it up or down, then
 to the right, to an arrow. Each step passes as soon as the animal comes most of the way to the
 arrow, even while the finger is still down, so a child never has to push it to the window's edge.
-It starts by itself every time a garden opens, the help button starts it again, and the cross or
+It starts automatically once across all gardens; Help can reopen it, and the cross or
 Escape ends it at any time.
 */
 const guideBox = document.querySelector(".guide");
@@ -809,6 +809,37 @@ const guideLabel = guideBox.querySelector(".guideLabel");
 const guideClose = guideBox.querySelector(".guideClose");
 const guideReach = 0.7;
 let guide = null;
+const guideHistoryKey = "gardenOfSoundsGuideShown";
+let guideShown = false;
+
+// All three gardens share this flag, including reloads and new tabs in the same browser.
+function hasSeenGuide() {
+    if (guideShown) return true;
+    let storageAvailable = false;
+    for (const storageName of ["localStorage", "sessionStorage"]) {
+        try {
+            if (window[storageName].getItem(guideHistoryKey) === "yes") return true;
+            storageAvailable = true;
+        } catch {
+            // Try session storage if persistent storage is blocked.
+        }
+    }
+    // With no storage, leave Help available instead of repeating guidance on every page.
+    return !storageAvailable;
+}
+
+function rememberGuide() {
+    guideShown = true;
+    try {
+        localStorage.setItem(guideHistoryKey, "yes");
+    } catch {
+        try {
+            sessionStorage.setItem(guideHistoryKey, "yes");
+        } catch {
+            // Help still works when the browser cannot save a visit.
+        }
+    }
+}
 
 function wait(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
@@ -918,6 +949,8 @@ async function runGuide() {
     target.item.classList.add("isGuideTarget");
     if (target.isPlaying) stopPlaying(target);
     guideBox.hidden = false;
+    // Count an automatic or manual guide only once it is actually displayed.
+    rememberGuide();
     // A mouse click on the help key should not leave a focus ring on it under the shade.
     helpButton.blur();
     placeGuide();
@@ -926,6 +959,7 @@ async function runGuide() {
     showGuideStep("tap", "Tap here!", `Every object plays music. The ${target.name.toLowerCase()} sings again and again.`);
     if (!(await waitUntil(currentGuide, () => target.isPlaying))) return;
     await wait(900);
+    if (guide !== currentGuide) return;
 
     // Up and down: the step passes once the animal reaches the arrow.
     const goesUp = pointGuide("up");
@@ -933,12 +967,14 @@ async function runGuide() {
         goesUp ? "Higher up sings higher notes." : "Lower down sings lower notes.");
     if (!(await waitUntil(currentGuide, () => hasReachedArrow("y")))) return;
     await wait(600);
+    if (guide !== currentGuide) return;
 
     // Then to the right, in the same way.
     pointGuide("across");
     showGuideStep("across", "Drag it right!", "Further right plays faster.");
     if (!(await waitUntil(currentGuide, () => hasReachedArrow("x")))) return;
     await wait(600);
+    if (guide !== currentGuide) return;
 
     guide.arrow = null;
     showGuideStep("done", "Your turn!", "Tap more objects to make music together, or the play button for the whole garden.");
@@ -1038,9 +1074,10 @@ setInterval(() => {
     }
 }, 5000);
 
-// The guide starts by itself every time a garden opens, just after the wiggle. If a finger is
-// already carrying an object, it waits until the object is put down.
+// Show the guide automatically only in the first garden visited. Recheck after a drag or a
+// manual Help visit, so a delayed entry timer cannot reopen a guide that was already shown.
 function startGuideOnEntry() {
+    if (hasSeenGuide()) return;
     if (gardenObjects.some(gardenObject => gardenObject.drag)) {
         setTimeout(startGuideOnEntry, 300);
     } else {
