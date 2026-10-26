@@ -88,7 +88,7 @@ The mapping and feedback come from peer testing of the eight Assignment 2 protot
   put the fruit in the basket. Until an object has played, a small note in a gold bubble bobs at
   its corner, so every object says it makes music, and the bubble fades once the object has sung.
 - **One tap is enough.** A tap starts the object singing straight away and another tap stops it;
-  dragging an object and letting go starts it from its new place. Every tap makes the object glow
+  dragging starts playback before release, with pitch and rhythm following its position. It glows
   along its outline, adapted from Prototype 5.
 - **Every note moves the object,** adapted from Prototype 8. Tools sway, animals hop and fruits
   swell, which reuses Prototype 4's grow-and-bounce as a repeating effect.
@@ -111,8 +111,8 @@ The mapping and feedback come from peer testing of the eight Assignment 2 protot
 - **Hints.** When a garden opens, and after 20 seconds of quiet, the playable objects wiggle one
   after another, so they stand apart from the flowers, basket and lake in the picture.
 - **Drop to place.** Putting an object down starts it singing from its new place, and a small
-  ripple spreads across the ground, adapted from Prototype 6. Dragging a resting object sounds
-  each rung it passes, like a finger along a xylophone.
+  ripple spreads across the ground, adapted from Prototype 6. Dragging starts the shared musical
+  playback and gives immediate feedback when pitch or rhythm changes, using the same synth.
 - **Controlled randomness.** Every tap makes the object a new short tune from its own set of
   notes, so the same object sounds different each time it is started but always like itself. The
   tune repeats as the object's own song, but each time round one note may swap for another from

@@ -5,7 +5,7 @@ This script makes every garden object playable. Height sets the notes and place 
 right sets how quickly they come. Every object has its own small set of notes, and the whole
 garden keeps one shared beat and one round of chords, so any mix of objects plays together as
 music. A tap starts an object singing a short tune from its set, made new on every tap, and
-another tap stops it. Dropping an object after a drag starts it too. Until an object has played,
+another tap stops it. Dragging starts its sound and changes it before release. Until it has played,
 a small note bobs beside it, so the garden reads as an instrument rather than a picture to tidy.
 Each kind of action has its own feedback: a press squashes the object at once, a tap glows, every
 note moves the object and sends up a small note, a drop sends a ripple across the ground, and a
@@ -188,7 +188,6 @@ const gardenObjects = [...document.querySelectorAll(".gardenObject")].map(item =
         lastNoteTime: 0,
         isPlaying: false,
         hasPlayed: false,
-        lastSlideNote: 0,
         dragEndedAt: 0,
         tappedAt: 0,
         drag: null,
@@ -689,13 +688,37 @@ function startDrag(gardenObject, event) {
         startY: event.clientY,
         offsetX: event.clientX - sceneBounds.left - x / 100 * sceneBounds.width,
         offsetY: event.clientY - sceneBounds.top - y / 100 * sceneBounds.height,
-        hasMoved: false
+        hasMoved: false,
+        step: gardenObject.step,
+        rhythm: findRhythm(gardenObject)
     };
     gardenObject.button.setPointerCapture(event.pointerId);
     gardenObject.item.classList.add("isPressed");
 
-    // A mouse press can unlock audio, so the first drag can already be heard.
-    if (event.pointerType === "mouse") prepareAudio();
+    // Unlock on the initial mouse, pen or touch gesture, before the object is released.
+    const drag = gardenObject.drag;
+    prepareAudio().then(isReady => {
+        if (isReady && gardenObject.drag === drag) soundWhileDragging(gardenObject);
+    }).catch(() => announce("Sound could not start. Tap the object to try again."));
+}
+
+function soundWhileDragging(gardenObject) {
+    const drag = gardenObject.drag;
+    if (!drag?.hasMoved || !audioIsRunning()) return;
+
+    const step = findStep(gardenObject);
+    const rhythm = findRhythm(gardenObject);
+    if (!gardenObject.isPlaying) {
+        // Reuse the shared beat so horizontal dragging can be heard before the object is dropped.
+        startPlaying(gardenObject);
+    } else if (step !== drag.step || rhythm !== drag.rhythm) {
+        const time = Tone.immediate() + 0.02;
+        // Avoid doubling a scheduled beat or flooding the same synth with rapid pointer events.
+        if (time - gardenObject.lastNoteTime < 0.12) return;
+        playNote(gardenObject, time, 0.5, noteForRung(gardenObject, step));
+    }
+    drag.step = step;
+    drag.rhythm = rhythm;
 }
 
 function moveDrag(gardenObject, event) {
@@ -717,15 +740,8 @@ function moveDrag(gardenObject, event) {
     const y = (event.clientY - drag.offsetY - sceneBounds.top) / sceneBounds.height * 100;
     placeObject(gardenObject, x, y);
 
-    // A resting object sounds each rung it passes, like a finger along a xylophone.
-    const stepChanged = updatePlace(gardenObject);
-    const now = performance.now();
-    if (stepChanged && !gardenObject.isPlaying && audioIsRunning()
-        && now - gardenObject.lastSlideNote > 70) {
-        gardenObject.lastSlideNote = now;
-        playNote(gardenObject, Tone.immediate() + 0.02, 0.4,
-            noteForRung(gardenObject, gardenObject.step));
-    }
+    updatePlace(gardenObject);
+    soundWhileDragging(gardenObject);
 }
 
 // Putting an object down starts its song from the new place, or keeps it singing.
