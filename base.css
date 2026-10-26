@@ -16,6 +16,7 @@ starting places in a second stylesheet.
     --butterYellow: #f7cb5c;
     --coral: #ef7a6d;
     --glowCore: #fffbe8;
+    --navButtonSize: clamp(4.75rem, 10vmin, 5.5rem);
 }
 
 /* Page */
@@ -28,7 +29,7 @@ body {
     margin: 0;
     color: var(--ink);
     background-color: var(--cream);
-    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261025");
+    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261026c");
     background-size: 20rem;
     font-family: Georgia, "Times New Roman", serif;
 }
@@ -76,11 +77,12 @@ button:focus-visible .buttonHover {
 
 /*
 The home button and chapter buttons float in the top corner of every garden, above the objects so
-they can always be reached. Each chapter button is a small round picture of its garden, so a child
-who cannot read numbers can still find a garden, and the current one has a gold rim.
+they can always be reached. Each chapter button is a round picture of its garden, so a child who
+cannot read numbers can still find a garden, and the current one has a gold rim. Every button is at
+least 75 pixels across, a size small fingers can hit.
 */
 .storyNav {
-    --buttonSize: clamp(2.75rem, 8vmin, 4rem);
+    --buttonSize: var(--navButtonSize);
     position: fixed;
     top: 0.75rem;
     left: 0.75rem;
@@ -114,7 +116,7 @@ who cannot read numbers can still find a garden, and the current one has a gold 
     right: calc(var(--buttonSize) * 0.4);
     left: calc(var(--buttonSize) * 0.4);
     height: calc(var(--buttonSize) * 0.2);
-    background: url("assets/buttons/path-across.webp?v=picture-book-20261025") center / 100% 100%;
+    background: url("assets/buttons/path-across.webp?v=picture-book-20261026c") center / 100% 100%;
     translate: 0 -50%;
     content: "";
 }
@@ -127,8 +129,70 @@ who cannot read numbers can still find a garden, and the current one has a gold 
     -webkit-tap-highlight-color: transparent;
 }
 
+/*
+The quiet and help buttons sit in the other top corner. On narrow screens the storybook buttons
+fill the top row, so these two move down to a second row.
+*/
+.gardenTools {
+    position: fixed;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 1;
+    display: flex;
+    gap: 0.75rem;
+}
+
+@media (max-width: 36rem) {
+    .gardenTools {
+        top: calc(1.5rem + var(--navButtonSize));
+    }
+}
+
+.toolButton {
+    position: relative;
+    display: block;
+    width: var(--navButtonSize);
+    padding: 0;
+    border: 0;
+    border-radius: 25%;
+    background: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: scale 0.15s ease-out;
+}
+
+.toolButton:active {
+    scale: 0.94;
+}
+
+/* With nothing playing, the quiet button shakes its head instead of doing nothing. */
+.quietButton.isShaking {
+    animation: tool-shake 0.45s ease-in-out;
+}
+
+@keyframes tool-shake {
+    0%,
+    100% {
+        translate: 0 0;
+    }
+
+    25%,
+    75% {
+        translate: -0.4rem 0;
+    }
+
+    50% {
+        translate: 0.4rem 0;
+    }
+}
+
+.helpButton[aria-pressed="true"] .buttonHover {
+    opacity: 1;
+}
+
 .homeButton:focus-visible,
-.chapterButton:focus-visible {
+.chapterButton:focus-visible,
+.toolButton:focus-visible {
     outline: 3px solid var(--ink);
     outline-offset: 0.2rem;
 }
@@ -234,6 +298,7 @@ and the invisible margin gives small fingers a larger target than the drawing it
     user-select: none;
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
+    transition: scale 0.12s ease-out;
 }
 
 .objectButton::before {
@@ -295,6 +360,11 @@ objects stop breathing, since every note already moves them.
     50% {
         scale: 1.035;
     }
+}
+
+/* A pressed object squashes at once, so a finger on it is answered before it lets go. */
+.isPressed .objectButton {
+    scale: 0.92;
 }
 
 /* A lifted object grows slightly and casts a shadow so the child can see it is being carried. */
@@ -374,6 +444,99 @@ the object's own outline instead of a circle, and its colour comes from the gard
     }
 }
 
+/* Playing state */
+
+/*
+A playing object keeps a soft halo in the garden's colour behind it, so a child can see at a
+glance which objects are making music. garden.js makes the halo pulse with every note and lets a
+small note float up from the object.
+*/
+.playHalo {
+    position: absolute;
+    inset: -30%;
+    z-index: -2;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(255 255 255 / 95%) 0%, var(--glowCore) 35%,
+            var(--glowColour) 65%, transparent 100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-out;
+}
+
+.gardenObject.isPlaying .playHalo {
+    opacity: 0.8;
+}
+
+.noteLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.floatingNote {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: clamp(1.6rem, 3.5vmin, 2.6rem);
+    height: auto;
+    translate: -50% -100%;
+    animation: note-float 1s ease-out both;
+}
+
+@keyframes note-float {
+    0% {
+        opacity: 0;
+        transform: translate(0, 0.5rem) scale(0.6);
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(var(--drift), -3rem) scale(1);
+    }
+}
+
+/* How-to-play demonstration */
+
+/* A see-through copy of an object shows the two moves, led by a big arrow picture. */
+.demoGhost {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+    opacity: 0.85;
+    translate: -50% -100%;
+}
+
+.demoGhost img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.demoGhost .playHalo {
+    opacity: 0.8;
+}
+
+.demoArrow {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--navButtonSize);
+    height: auto;
+    translate: -50% -50%;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+}
+
+.demoArrow.isShown {
+    opacity: 1;
+}
+
 /* Drop feedback */
 
 /*
@@ -406,6 +569,14 @@ so one small ring now spreads flat across the ground only where an object is put
 
 /* Reduced motion keeps every response but removes the growing waves and the resting breath. */
 @media (prefers-reduced-motion: reduce) {
+    .floatingNote {
+        display: none;
+    }
+
+    .quietButton.isShaking {
+        animation: none;
+    }
+
     .gardenObject,
     .gardenObject.isGlowing .objectButton::after {
         animation: none;
