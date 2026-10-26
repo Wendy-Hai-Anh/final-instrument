@@ -21,13 +21,16 @@ and it fills the whole browser window.
 - `base.css` holds the colour tokens and picture buttons that every page shares, and the
   responsive scene, the objects and the visual feedback that every garden shares.
 - `garden.js` holds the sound and interaction that every garden shares.
+- `button-press.js` gives every button its press: the key sinks into its shadow and springs back.
 - `assets/textures/` holds the paper grain behind the page.
 - `assets/storybook/` holds the book pictures: the teal backdrop, the closed cover, the inside of
   the cover, the back board, the ribbon, the spine rings, a left and a right page for each
   spread and the turn-sideways picture. `assets/buttons/` holds the home, arrow, close, play,
-  quiet and help buttons, the floating note, and the round chapter buttons (each a small
+  pause, play-again and help buttons, the floating note, and the round chapter buttons (each a small
   picture of its garden, with a gold rim for the current one) and the path that joins them.
-  Each square button is a raised picture that turns flat on hover, as if pressed. The buttons
+  Each square button is a raised picture that turns flat while it is pressed, as if it sank into
+  its shadow, and springs back up on release (`button-press.js`); the pause button swaps to a
+  play key while sounds are paused, and the demonstration uses shadowless up and right arrows. The buttons
   share the storybook palette: a cream paper key, warm brown lines and a gold shadow like the
   play button.
 - `versions/` holds one folder per garden:
@@ -74,10 +77,13 @@ The mapping and feedback come from peer testing of the eight Assignment 2 protot
 - **Playing objects glow.** A playing object keeps a soft halo in the garden's colour that
   pulses with each note, and a small note floats up from it, so a child can see which objects
   are making music.
-- **Quiet and help.** The pause button in the top corner stops every sound at once. The
-  question-mark button replays a short demonstration: a see-through animal rises from the
-  ground to the sky as its notes climb, then slides to the right as its notes come faster. The
-  demonstration also plays once, silently, on a child's first visit.
+- **Pause and help.** The pause button in the top corner pauses every sound at once and then
+  turns into a play button that brings the same sounds back; with nothing playing it fades and
+  only shakes when pressed. The question-mark button replays a short demonstration: a big arrow
+  leads a see-through animal up from the ground to the sky as its notes climb, then to the right
+  as its notes come faster. The arrow is a plain key without a shadow and travels on the same
+  line just ahead of the animal. The demonstration also plays once, silently, on a child's first
+  visit.
 - **One look.** The orchard and meadow objects have their outlines softened towards each
   garden's own deep colour, so they sit in those painterly pictures as the lakeside objects sit
   in its outlined one.

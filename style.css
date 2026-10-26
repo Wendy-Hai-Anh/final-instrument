@@ -11,8 +11,8 @@ mistake. The gardens themselves are styled by base.css and each version's own st
 .storybookPage {
     overflow: hidden;
     background-color: #3e8a92;
-    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261026c"),
-        url("assets/storybook/backdrop.webp?v=picture-book-20261026c");
+    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261026d"),
+        url("assets/storybook/backdrop.webp?v=picture-book-20261026d");
     background-position: 0 0, center;
     background-size: 20rem, cover;
 }
@@ -230,8 +230,8 @@ as a reminder that the picture can be tapped.
 /* Big buttons */
 
 /*
-The arrows and the cross are pictures: the raised one shows at rest and the flat one shows on
-hover, as if the button were being pressed down.
+The arrows and the cross are pictures: the raised one shows at rest and the flat one shows while
+the button is pressed, as if it sank into its shadow.
 */
 .bookButton {
     position: relative;
@@ -244,11 +244,7 @@ hover, as if the button were being pressed down.
     background: none;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    transition: opacity 0.3s ease-out, scale 0.15s ease-out;
-}
-
-.bookButton:active {
-    scale: 0.94;
+    transition: opacity 0.3s ease-out;
 }
 
 /* The arrows sit over the left and right edges of the book, halfway down. */

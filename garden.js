@@ -7,8 +7,9 @@ moves it. Each kind of action has its own feedback: a press squashes the object 
 glows, every note moves the object, a drop sends a ripple across the ground, and a tap on the
 garden itself sends a small ripple too, so no touch goes unanswered. Several fingers can play
 different objects at the same time. A playing object keeps a soft halo and sends up a small note
-with every sound, the quiet button stops everything, and the help button replays a short
-demonstration of how height and place change the sound.
+with every sound, the pause button pauses everything and then turns into a play button that brings
+it back, and the help button replays a short demonstration of how height and place change the
+sound.
 */
 
 /* Page elements and settings ------------------------------------------------ */
@@ -29,8 +30,12 @@ const maxRipples = 6;
 const maxNotes = 12;
 const idleHintDelay = 20000;
 
-// The floating note shares the buttons' folder and cache-busting version.
+// The floating note, the demo arrows and the play key share the buttons' folder and version.
 const noteSource = quietButton.querySelector(".buttonImage").src.replace("quiet-raised", "note");
+
+function buttonSource(name) {
+    return noteSource.replace("/note.", `/${name}.`);
+}
 
 /* Musical mapping ----------------------------------------------------------- */
 // Pentatonic steps never clash, so any mix of objects and places stays in tune.
@@ -485,14 +490,48 @@ function addRipple(x, y, width) {
 }
 
 /* Tapping ------------------------------------------------------------------- */
+let pausedObjects = [];
+
 function setPlaying(gardenObject, isPlaying) {
     gardenObject.isPlaying = isPlaying;
     gardenObject.button.setAttribute("aria-pressed", String(isPlaying));
     gardenObject.item.classList.toggle("isPlaying", isPlaying);
+
+    // Starting a new sound forgets the paused ones, so the key goes back to pausing.
+    if (isPlaying) pausedObjects = [];
+    updateQuietButton();
 }
 
-// The quiet button stops every playing object at once; each one glows once as it stops.
-function stopAll() {
+/*
+The pause key always shows what it will do. With sounds playing it shows pause; after a press it
+shows play, which brings the same sounds back; with nothing to pause it fades back, and a press
+only shakes it.
+*/
+function updateQuietButton() {
+    const isPaused = pausedObjects.length > 0;
+    const key = isPaused ? "resume" : "quiet";
+    const [raised, flat] = quietButton.querySelectorAll("img");
+
+    raised.src = buttonSource(`${key}-raised`);
+    flat.src = buttonSource(key);
+    raised.alt = isPaused ? "Play the sounds again" : "Pause all sounds";
+    quietButton.classList.toggle("isIdle", !isPaused && !hasPlayingObject());
+}
+
+async function pauseOrResume() {
+    if (pausedObjects.length > 0) {
+        if (!(await prepareAudio())) return;
+
+        const paused = pausedObjects;
+        paused.forEach(gardenObject => {
+            setPlaying(gardenObject, true);
+            playNote(gardenObject, Tone.immediate() + 0.02, 0.6);
+            glowObject(gardenObject);
+        });
+        announce("Playing again.");
+        return;
+    }
+
     const playing = gardenObjects.filter(gardenObject => gardenObject.isPlaying);
 
     if (playing.length === 0) {
@@ -503,11 +542,14 @@ function stopAll() {
         return;
     }
 
+    // Each object glows once as it pauses.
     playing.forEach(gardenObject => {
         setPlaying(gardenObject, false);
         glowObject(gardenObject);
     });
-    announce("All quiet.");
+    pausedObjects = playing;
+    updateQuietButton();
+    announce("Paused. Press play to hear them again.");
 }
 async function toggleObject(gardenObject) {
     if (!(await prepareAudio())) return;
@@ -642,11 +684,13 @@ function handleKey(gardenObject, event) {
 /*
 A see-through copy of an animal shows the two moves. First it rises from the ground to the sky
 while its notes climb, then it slides from left to right while its notes come faster and faster.
-The help button replays it with sound, and it plays once, silently, on a child's first visit.
+A big arrow goes first on the same line, and the copy follows behind it. The help button replays
+it with sound, and it plays once, silently, on a child's first visit.
 */
 const riseDuration = 2800;
 const slideDuration = 4500;
 const slideGaps = [600, 300, 150];
+const arrowLead = 400;
 let isDemoRunning = false;
 
 function wait(milliseconds) {
@@ -662,6 +706,18 @@ function makeDemoPicture(className, source, x, y) {
     picture.style.setProperty("--y", `${y}%`);
     noteLayer.append(picture);
     return picture;
+}
+
+// Moves a demo picture between two places, given as percentages of the garden.
+function glide(picture, from, to, duration, easing) {
+    return picture.animate([
+        { left: `${from.x}%`, top: `${from.y}%` },
+        { left: `${to.x}%`, top: `${to.y}%` }
+    ], {
+        duration,
+        easing: reducedMotionQuery.matches ? "steps(3, jump-none)" : easing,
+        fill: "forwards"
+    });
 }
 
 async function runDemo(withSound) {
@@ -705,22 +761,34 @@ async function runDemo(withSound) {
         floatNote(x, y - height);
     }
 
-    // Rise: the centre starts in the ground zone and ends in the sky zone.
-    const riseX = 18;
+    // The arrow keeps a small gap from the copy and stays inside the window.
+    const layer = noteLayer.getBoundingClientRect();
+    const upArrow = makeDemoPicture("demoArrow", buttonSource("arrow-up"), 0, 0);
+    const arrowSize = upArrow.offsetWidth;
+    const gap = arrowSize * 0.2;
+    const leadY = (arrowSize / 2 + gap) / layer.height * 100;
+    const leadX = (model.item.offsetWidth / 2 + gap + arrowSize / 2) / layer.width * 100;
+    const topLimit = (arrowSize / 2 + 12 - layer.top) / layer.height * 100;
+    const rightLimit = (window.innerWidth - arrowSize / 2 - 12 - layer.left) / layer.width * 100;
+
+    // Rise: the copy starts in the ground zone and ends in the sky zone, under its arrow.
+    const riseX = 50;
     const lowY = Math.min(groundLine + height / 2 + 4, 98);
-    const highY = Math.max(skyLine + height / 2 - 6, height + 2);
-    const upArrow = makeDemoPicture("demoArrow", noteSource.replace("/note.", "/up-raised."),
-        riseX + 16, (lowY + highY) / 2 - height / 2);
+    const highY = Math.max(skyLine + height / 2 - 6, topLimit + leadY + height);
+    const riseFrom = { x: riseX, y: lowY - height - leadY };
+    const riseTo = { x: riseX, y: highY - height - leadY };
 
     ghost.style.setProperty("--x", `${riseX}%`);
     ghost.style.setProperty("--y", `${lowY}%`);
+    upArrow.style.setProperty("--x", `${riseFrom.x}%`);
+    upArrow.style.setProperty("--y", `${riseFrom.y}%`);
     upArrow.classList.add("isShown");
     announce("Watch: higher up plays higher notes.");
-    ghost.animate([{ top: `${lowY}%` }, { top: `${highY}%` }], {
-        duration: riseDuration,
-        easing: instant ? "steps(3, jump-none)" : "ease-in-out",
-        fill: "forwards"
-    });
+
+    // The arrow sets off first and the copy follows a moment later.
+    glide(upArrow, riseFrom, riseTo, riseDuration, "ease-in-out");
+    await wait(arrowLead);
+    glide(ghost, { x: riseX, y: lowY }, { x: riseX, y: highY }, riseDuration, "ease-in-out");
 
     // One note in each zone, as the copy passes through it.
     for (const [index, zone] of ["ground", "garden", "sky"].entries()) {
@@ -733,26 +801,31 @@ async function runDemo(withSound) {
 
     // Slide: the copy crosses the three columns in the middle zone, sounding ever more often.
     const middleY = (skyLine + groundLine) / 2 + height / 2;
-    const rightArrow = makeDemoPicture("demoArrow", noteSource.replace("/note.", "/next-raised."),
-        50, middleY - height - 8);
+    const startX = 10;
+    const endX = Math.min(90, rightLimit - leadX);
+    const slideFrom = { x: startX + leadX, y: middleY - height / 2 };
+    const slideTo = { x: endX + leadX, y: middleY - height / 2 };
+    const rightArrow = makeDemoPicture("demoArrow", buttonSource("arrow-right"), slideFrom.x,
+        slideFrom.y);
 
+    ghost.getAnimations().forEach(animation => animation.cancel());
+    ghost.style.setProperty("--x", `${startX}%`);
+    ghost.style.setProperty("--y", `${middleY}%`);
     rightArrow.classList.add("isShown");
     announce("Further right plays faster.");
-    ghost.getAnimations().forEach(animation => animation.cancel());
-    ghost.style.setProperty("--y", `${middleY}%`);
-    ghost.animate([{ left: "10%" }, { left: "90%" }], {
-        duration: slideDuration,
-        easing: instant ? "steps(3, jump-none)" : "linear",
-        fill: "forwards"
-    });
+
+    glide(rightArrow, slideFrom, slideTo, slideDuration, "linear");
+    await wait(arrowLead);
+    glide(ghost, { x: startX, y: middleY }, { x: endX, y: middleY }, slideDuration, "linear");
 
     const start = performance.now();
     const third = slideDuration / 3;
     for (const [column, gap] of slideGaps.entries()) {
         for (let time = column * third; time < (column + 1) * third - 10; time += gap) {
             await wait(Math.max(0, start + time - performance.now()));
-            const x = instant ? 10 + column * 40 : 10 + 80 * (time / slideDuration);
-            sound(zones.garden.octave + model.family.octaveShift, 0, x, middleY);
+            const progress = instant ? column / 2 : time / slideDuration;
+            sound(zones.garden.octave + model.family.octaveShift, 0,
+                startX + (endX - startX) * progress, middleY);
         }
     }
     await wait(Math.max(0, start + slideDuration - performance.now()) + 200);
@@ -819,7 +892,8 @@ gardenObjects.forEach(gardenObject => {
     updatePlace(gardenObject);
 });
 
-quietButton.addEventListener("click", stopAll);
+quietButton.addEventListener("click", pauseOrResume);
+updateQuietButton();
 helpButton.addEventListener("click", () => runDemo(true));
 
 // Any touch or key counts as play, which holds back the hints.
