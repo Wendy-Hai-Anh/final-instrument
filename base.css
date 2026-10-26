@@ -1,8 +1,19 @@
 /*
 This stylesheet holds what the pages share: the colour tokens, the picture buttons, and the
-garden layout and feedback. Each garden adds its glow colour, pitch zone lines and object
-starting places in a second stylesheet.
+garden layout, feedback and guide. Each garden adds its glow colour and object starting places
+in a second stylesheet.
 */
+
+/* Lettering */
+
+/* Fredoka is the rounded lettering on the book's cover (SIL Open Font License). */
+@font-face {
+    font-family: Fredoka;
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url("assets/fonts/fredoka-semibold-latin.woff2?v=picture-book-20261027b") format("woff2");
+}
 
 /* Colour tokens */
 
@@ -16,7 +27,7 @@ starting places in a second stylesheet.
     --butterYellow: #f7cb5c;
     --coral: #ef7a6d;
     --glowCore: #fffbe8;
-    --navButtonSize: clamp(4.75rem, 10vmin, 5.5rem);
+    --navButtonSize: clamp(2.75rem, 10vmin, 5.5rem);
 }
 
 /* Page */
@@ -29,7 +40,7 @@ body {
     margin: 0;
     color: var(--ink);
     background-color: var(--cream);
-    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261027a");
+    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261027b");
     background-size: 20rem;
     font-family: Georgia, "Times New Roman", serif;
 }
@@ -151,7 +162,7 @@ least 75 pixels across, a size small fingers can hit.
     right: calc(var(--buttonSize) * 0.4);
     left: calc(var(--buttonSize) * 0.4);
     height: calc(var(--buttonSize) * 0.2);
-    background: url("assets/buttons/path-across.webp?v=picture-book-20261027a") center / 100% 100%;
+    background: url("assets/buttons/path-across.webp?v=picture-book-20261027b") center / 100% 100%;
     translate: 0 -50%;
     content: "";
 }
@@ -178,7 +189,7 @@ fill the top row, so these two move down to a second row.
     gap: 0.75rem;
 }
 
-@media (max-width: 36rem) {
+@media (max-width: 22rem) {
     .gardenTools {
         top: calc(1.5rem + var(--navButtonSize));
     }
@@ -507,45 +518,250 @@ small note float up from the object.
     }
 }
 
-/* How-to-play demonstration */
+/* How-to-play guide */
 
 /*
-A see-through copy of an object shows the two moves, led by a big arrow on the same line. The arrow
-is a plain key without a shadow, so it reads clearly on a busy garden.
+The guide covers the window. A dark shade with a round hole lights up the one object to play
+with, and only that object, the guide's words and its cross can be pressed. A hand taps on the
+object, then shows a drag up or down and left or right, with an arrow where the drag ends.
 */
-.demoGhost {
+.guide {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.guide[hidden] {
+    display: none;
+}
+
+.guideSpot {
     position: absolute;
-    left: var(--x);
-    top: var(--y);
-    width: var(--w);
-    opacity: 0.85;
-    translate: -50% -100%;
-}
-
-.demoGhost img {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
-.demoGhost .playHalo {
-    opacity: 0.8;
-}
-
-.demoArrow {
-    position: absolute;
-    left: var(--x);
-    top: var(--y);
-    width: calc(var(--navButtonSize) * 1.3);
-    height: auto;
+    left: var(--spotX);
+    top: var(--spotY);
+    width: var(--spotSize);
     aspect-ratio: 1;
+    border: 0.25rem dashed rgb(255 247 230 / 90%);
+    border-radius: 50%;
+    box-shadow: 0 0 0 200vmax rgb(46 30 24 / 62%);
     translate: -50% -50%;
-    opacity: 0;
-    transition: opacity 0.3s ease-out;
 }
 
-.demoArrow.isShown {
-    opacity: 1;
+.guide[data-step="tap"] .guideSpot {
+    animation: guide-spot 0.9s ease-in-out infinite;
+}
+
+@keyframes guide-spot {
+    0%,
+    100% {
+        scale: 1;
+    }
+
+    50% {
+        scale: 1.08;
+    }
+}
+
+/* The fingertip sits on the middle of the object. */
+.guideHand {
+    position: absolute;
+    left: var(--spotX);
+    top: var(--spotY);
+    width: clamp(4rem, 13vmin, 7rem);
+    height: auto;
+    translate: -46% -4%;
+}
+
+.guide[data-step="tap"] .guideHand {
+    animation: guide-tap 0.9s ease-in-out infinite;
+}
+
+.guide[data-step="up"] .guideHand,
+.guide[data-step="across"] .guideHand {
+    animation: guide-drag 2.2s ease-in-out infinite;
+}
+
+.guide[data-step="done"] .guideHand {
+    display: none;
+}
+
+@keyframes guide-tap {
+    0%,
+    100% {
+        transform: translateY(-1.4rem);
+    }
+
+    45% {
+        transform: translateY(0) scale(0.9);
+    }
+
+    60% {
+        transform: translateY(0) scale(0.9);
+    }
+}
+
+@keyframes guide-drag {
+    0% {
+        opacity: 0;
+        transform: translate(0, 0) scale(0.9);
+    }
+
+    12% {
+        opacity: 1;
+        transform: translate(0, 0) scale(0.9);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translate(var(--moveX), var(--moveY)) scale(0.9);
+    }
+
+    90%,
+    100% {
+        opacity: 0;
+        transform: translate(var(--moveX), var(--moveY)) scale(0.9);
+    }
+}
+
+.guideArrow {
+    position: absolute;
+    left: var(--arrowX);
+    top: var(--arrowY);
+    display: none;
+    width: clamp(3rem, 10vmin, 5.5rem);
+    height: auto;
+    rotate: var(--arrowTurn, 0deg);
+    translate: -50% -50%;
+}
+
+.guide[data-step="up"] .guideArrow,
+.guide[data-step="across"] .guideArrow {
+    display: block;
+}
+
+.guideLabel {
+    position: absolute;
+    left: var(--labelX);
+    top: var(--labelY);
+    display: grid;
+    gap: 0.15rem;
+    width: max-content;
+    max-width: min(22rem, 100vw - 1rem);
+    margin: 0;
+    padding: 0.6rem 1rem 0.7rem;
+    border: 0.2rem solid #4e2e24;
+    border-radius: 1rem;
+    background-color: #fff5e0;
+    color: #4e2e24;
+    font-family: Fredoka, "Trebuchet MS", sans-serif;
+    font-weight: 600;
+    text-align: center;
+    translate: -50% 0;
+}
+
+.guideTitle {
+    font-size: clamp(1.3rem, 4.5vmin, 2rem);
+}
+
+.guideHint {
+    font-size: clamp(0.85rem, 2.6vmin, 1.1rem);
+}
+
+.guideClose {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    pointer-events: auto;
+}
+
+/* While the guide runs, only the lit object can be played. */
+.isGuiding .storyNav,
+.isGuiding .gardenTools,
+.isGuiding .gardenObject:not(.isGuideTarget) {
+    pointer-events: none;
+}
+
+/* Turning the phone */
+
+/*
+On an upright phone a card asks for the screen to be turned sideways, where the garden has room.
+It disappears by itself once the phone is turned, and can be put away to play upright.
+*/
+.turnPrompt {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: none;
+    place-items: center;
+    padding: 1rem;
+    background-color: rgb(46 30 24 / 55%);
+}
+
+.turnCard {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    width: min(20rem, 100%);
+    padding: 1.25rem 1.25rem 1.5rem;
+    border: 0.2rem solid #4e2e24;
+    border-radius: 1.25rem;
+    background-color: #fff5e0;
+    color: #4e2e24;
+    font-family: Fredoka, "Trebuchet MS", sans-serif;
+    font-weight: 600;
+    text-align: center;
+}
+
+.turnCard img {
+    width: 8rem;
+    height: auto;
+    animation: turn-phone 2.4s ease-in-out infinite;
+}
+
+.turnCard p {
+    margin: 0;
+    font-size: 1.4rem;
+    line-height: 1.25;
+}
+
+.turnDismiss {
+    padding: 0.5rem 1rem;
+    border: 0.15rem solid #4e2e24;
+    border-radius: 0.75rem;
+    background-color: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.turnDismiss:hover,
+.turnDismiss:focus-visible {
+    background-color: var(--butterYellow);
+}
+
+@keyframes turn-phone {
+    0%,
+    20% {
+        rotate: 0deg;
+    }
+
+    55%,
+    100% {
+        rotate: -90deg;
+    }
+}
+
+@media (max-aspect-ratio: 4/5) and (pointer: coarse), (max-aspect-ratio: 4/5) and (max-width: 37.5rem) {
+    .turnPrompt {
+        display: grid;
+    }
+
+    .turnPrompt.isPutAway {
+        display: none;
+    }
 }
 
 /* Drop feedback */
@@ -584,8 +800,11 @@ so one small ring now spreads flat across the ground only where an object is put
         display: none;
     }
 
-    .isSpringing .buttonImage {
-        animation: none;
+    .isSpringing .buttonImage,
+    .guideSpot,
+    .guideHand,
+    .turnCard img {
+        animation: none !important;
     }
 
     .gardenObject,
@@ -612,7 +831,7 @@ so one small ring now spreads flat across the ground only where an object is put
 
 /*
 Square and portrait windows use a taller garden instead of a squashed wide one, so objects keep
-a comfortable size and have room to move up and down between the pitch zones. Each picture
+a comfortable size and have room to move up and down for higher and lower notes. Each picture
 continues far enough to cover every window shape that uses it.
 */
 @media (max-aspect-ratio: 11/10) {
@@ -623,12 +842,22 @@ continues far enough to cover every window shape that uses it.
     }
 }
 
-/* The narrowest windows are usually phones, so objects grow slightly to be easy to touch. */
+/*
+The narrowest windows are usually phones, so objects grow to be easy to touch and to stay the
+main thing on the small screen, while the buttons shrink.
+*/
 @media (max-aspect-ratio: 3/5) {
     .gardenScene {
         --sceneRatio: 0.5;
-        --objectScale: 1.25;
+        --objectScale: 1.6;
         --extendX: 0.1;
         --extendY: 0.2;
+    }
+}
+
+/* A phone turned sideways is short, so its objects grow in the same way. */
+@media (min-aspect-ratio: 11/10) and (max-height: 31rem) {
+    .gardenScene {
+        --objectScale: 1.5;
     }
 }

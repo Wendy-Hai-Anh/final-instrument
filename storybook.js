@@ -24,7 +24,6 @@ const turnDuration = 850;
 const enterDuration = 800;
 const closeStagger = 140;
 const swipeDistance = 50;
-const holdTime = 1500;
 
 // The last spread shows the back of the last leaf and the page that lies flat under it.
 const lastSpread = leaves.length;
@@ -84,6 +83,73 @@ function playRustle(isCover) {
         source.start(now);
     } catch {
         // The book still works silently where Web Audio is unavailable.
+    }
+}
+
+/* Welcome tune ------------------------------------------------------------- */
+/*
+A short, bouncy tune greets a child when the storybook opens: a run of bright notes, a little
+bass bounce and a slide-whistle swoop at the end. One of a few tunes is picked each time.
+Browsers only allow sound after a first touch, so if the page cannot sing when it loads, the
+tune waits for the first tap or key instead.
+*/
+const welcomeTunes = [
+    [0, 4, 7, 12, 9, 7, 12, 16],
+    [7, 4, 0, 4, 7, 9, 12, 14, 12],
+    [0, 2, 4, 7, 4, 9, 7, 12, 16]
+];
+let hasWelcomed = false;
+
+function playTone(start, frequency, length, type, loudness) {
+    const oscillator = audioContext.createOscillator();
+    const volume = audioContext.createGain();
+
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, start);
+    volume.gain.setValueAtTime(0.0001, start);
+    volume.gain.exponentialRampToValueAtTime(loudness, start + 0.015);
+    volume.gain.exponentialRampToValueAtTime(0.0001, start + length);
+    oscillator.connect(volume).connect(audioContext.destination);
+    oscillator.start(start);
+    oscillator.stop(start + length + 0.05);
+    return oscillator;
+}
+
+function playWelcome() {
+    if (hasWelcomed) return;
+
+    try {
+        audioContext = audioContext || new AudioContext();
+        if (audioContext.state !== "running") return;
+        hasWelcomed = true;
+
+        const tune = welcomeTunes[Math.floor(Math.random() * welcomeTunes.length)];
+        const root = 523.25;
+        const note = semitones => root * 2 ** (semitones / 12);
+        let time = audioContext.currentTime + 0.05;
+
+        tune.forEach((semitones, index) => {
+            // Every other note is a little shorter, which gives the run a skip.
+            const step = index % 2 === 0 ? 0.15 : 0.11;
+            playTone(time, note(semitones), 0.28, "triangle", 0.18);
+            if (index % 4 === 0) playTone(time, note(semitones - 24), 0.22, "sine", 0.22);
+            time += step;
+        });
+
+        // The slide-whistle swoop.
+        const swoop = playTone(time + 0.05, note(0), 0.55, "sine", 0.12);
+        swoop.frequency.exponentialRampToValueAtTime(note(19), time + 0.5);
+    } catch {
+        // The book still works silently where Web Audio is unavailable.
+    }
+}
+
+function welcomeOnFirstTouch() {
+    try {
+        audioContext = audioContext || new AudioContext();
+        audioContext.resume().then(playWelcome);
+    } catch {
+        // No sound, no tune.
     }
 }
 
@@ -337,45 +403,22 @@ document.addEventListener("keydown", event => {
 });
 
 /* Grown-ups corner --------------------------------------------------------- */
-/*
-The help for grown-ups opens only after the label is held down, by finger, mouse or key, so a
-child's quick tap does nothing. Letting go early cancels it.
-*/
-let holdTimer = null;
-
-function startHold(event) {
-    if (holdTimer || grownUpPanel.open) return;
-    const isHoldKey = event.key === "Enter" || event.key === " ";
-    if (event.type === "keydown" && (event.repeat || !isHoldKey)) return;
-
-    event.preventDefault();
-    grownUpButton.style.setProperty("--holdTime", `${holdTime}ms`);
-    grownUpButton.classList.add("isHolding");
-    holdTimer = window.setTimeout(() => {
-        stopHold();
-        grownUpPanel.showModal();
-    }, holdTime);
-}
-
-function stopHold() {
-    window.clearTimeout(holdTimer);
-    holdTimer = null;
-    grownUpButton.classList.remove("isHolding");
-}
-
-grownUpButton.addEventListener("pointerdown", startHold);
-grownUpButton.addEventListener("keydown", startHold);
-["pointerup", "pointerleave", "pointercancel", "keyup", "blur"].forEach(type => {
-    grownUpButton.addEventListener(type, stopHold);
-});
-// The label is not a plain button, so a click on its own must not open anything.
-grownUpButton.addEventListener("click", event => event.preventDefault());
-grownUpButton.addEventListener("contextmenu", event => event.preventDefault());
+grownUpButton.addEventListener("click", () => grownUpPanel.showModal());
 
 // Book keys must not turn pages behind the open panel.
 grownUpPanel.addEventListener("keydown", event => event.stopPropagation());
 
 /* Setup --------------------------------------------------------------------- */
+// The tune plays at once where the browser allows it, otherwise on the first touch or key.
+try {
+    audioContext = new AudioContext();
+    audioContext.resume().then(playWelcome).catch(() => {});
+} catch {
+    // No sound, no tune.
+}
+["pointerdown", "keydown"].forEach(type => {
+    document.addEventListener(type, welcomeOnFirstTouch, { once: true });
+});
 sizeClosedBook();
 window.addEventListener("resize", sizeClosedBook);
 stackLeaves();
