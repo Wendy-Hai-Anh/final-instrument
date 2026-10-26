@@ -14,6 +14,8 @@ const stillPage = book.querySelector(".stillPage");
 const backButton = document.querySelector(".backButton");
 const nextButton = document.querySelector(".nextButton");
 const closeButton = document.querySelector(".closeButton");
+const grownUpButton = document.querySelector(".grownUpButton");
+const grownUpPanel = document.querySelector(".grownUpPanel");
 const bookStatus = document.querySelector("#book-status");
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -22,6 +24,7 @@ const turnDuration = 850;
 const enterDuration = 800;
 const closeStagger = 140;
 const swipeDistance = 50;
+const holdTime = 1500;
 
 // The last spread shows the back of the last leaf and the page that lies flat under it.
 const lastSpread = leaves.length;
@@ -160,14 +163,19 @@ function goTo(newSpread) {
 /* Sizing the closed book ---------------------------------------------------- */
 /*
 A closed book is half as wide as an open one, so it grows as far as the window allows, while
-leaving the corner beside it free for the note for grown-ups.
+keeping clear of the grown-ups label in the top corner, either beside it or below it.
 */
 function sizeClosedBook() {
     const openWidth = book.offsetWidth;
     const openHeight = book.offsetHeight;
-    const noteRoom = document.querySelector(".grownUpNote").offsetWidth + 32;
-    const room = Math.min((window.innerWidth - 2 * noteRoom) / (openWidth / 2),
+    const label = grownUpButton.getBoundingClientRect();
+    const labelRight = label.right + 16;
+    const labelBottom = label.bottom + 16;
+    const windowRoom = Math.min(window.innerWidth * 0.94 / (openWidth / 2),
         window.innerHeight * 0.94 / openHeight);
+    const roomBeside = (window.innerWidth - 2 * labelRight) / (openWidth / 2);
+    const roomBelow = (window.innerHeight - 2 * labelBottom) / openHeight;
+    const room = Math.min(windowRoom, Math.max(roomBeside, roomBelow));
 
     book.style.setProperty("--closedScale", String(Math.max(1, Math.min(room, 2))));
 }
@@ -226,11 +234,10 @@ function openOnGarden(garden) {
 
     spread = index + 2;
     book.classList.add("isInstant");
-    // The note for grown-ups hides at once, rather than fading over the returning garden.
-    const grownUpNote = document.querySelector(".grownUpNote");
-    grownUpNote.style.transition = "none";
+    // The grown-ups label hides at once, rather than fading over the returning garden.
+    grownUpButton.style.transition = "none";
     window.setTimeout(() => {
-        grownUpNote.style.transition = "";
+        grownUpButton.style.transition = "";
     }, enterDuration);
     leaves.forEach((leaf, leafIndex) => leaf.classList.toggle("isTurned", leafIndex < spread));
     stackLeaves();
@@ -266,8 +273,13 @@ function handleTurnButton(event) {
     if (turn === "close") goTo(0);
 }
 
-// A swipe across the book turns the page, like dragging paper with a finger.
+/*
+A swipe across the book turns the page, like dragging paper with a finger. Only the first finger
+counts, so a second hand resting on the screen, or a sibling joining in, cannot flip pages.
+*/
 book.addEventListener("pointerdown", event => {
+    if (!event.isPrimary) return;
+
     swipe = {
         x: event.clientX,
         y: event.clientY
@@ -278,7 +290,7 @@ book.addEventListener("pointerdown", event => {
 book.addEventListener("dragstart", event => event.preventDefault());
 
 book.addEventListener("pointerup", event => {
-    if (!swipe) return;
+    if (!swipe || !event.isPrimary) return;
 
     const distanceX = event.clientX - swipe.x;
     const distanceY = event.clientY - swipe.y;
@@ -323,6 +335,45 @@ document.addEventListener("keydown", event => {
     if (event.key === "ArrowLeft") goTo(spread - 1);
     if (event.key === "Escape") goTo(0);
 });
+
+/* Grown-ups corner --------------------------------------------------------- */
+/*
+The help for grown-ups opens only after the label is held down, by finger, mouse or key, so a
+child's quick tap does nothing. Letting go early cancels it.
+*/
+let holdTimer = null;
+
+function startHold(event) {
+    if (holdTimer || grownUpPanel.open) return;
+    const isHoldKey = event.key === "Enter" || event.key === " ";
+    if (event.type === "keydown" && (event.repeat || !isHoldKey)) return;
+
+    event.preventDefault();
+    grownUpButton.style.setProperty("--holdTime", `${holdTime}ms`);
+    grownUpButton.classList.add("isHolding");
+    holdTimer = window.setTimeout(() => {
+        stopHold();
+        grownUpPanel.showModal();
+    }, holdTime);
+}
+
+function stopHold() {
+    window.clearTimeout(holdTimer);
+    holdTimer = null;
+    grownUpButton.classList.remove("isHolding");
+}
+
+grownUpButton.addEventListener("pointerdown", startHold);
+grownUpButton.addEventListener("keydown", startHold);
+["pointerup", "pointerleave", "pointercancel", "keyup", "blur"].forEach(type => {
+    grownUpButton.addEventListener(type, stopHold);
+});
+// The label is not a plain button, so a click on its own must not open anything.
+grownUpButton.addEventListener("click", event => event.preventDefault());
+grownUpButton.addEventListener("contextmenu", event => event.preventDefault());
+
+// Book keys must not turn pages behind the open panel.
+grownUpPanel.addEventListener("keydown", event => event.stopPropagation());
 
 /* Setup --------------------------------------------------------------------- */
 sizeClosedBook();

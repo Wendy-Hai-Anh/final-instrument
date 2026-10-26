@@ -1,7 +1,8 @@
 /*
 This stylesheet lays out the storybook that opens the gardens. The book fills as much of the
-window as it can, the big arrows sit on its edges and a cross closes it. The gardens themselves
-are styled by base.css and each version's own stylesheet.
+window as it can, the big arrows sit on its edges and a cross closes it. Every button is at least
+75 pixels across for small fingers, and none sits along the bottom edge, where children tap by
+mistake. The gardens themselves are styled by base.css and each version's own stylesheet.
 */
 
 /* Storybook page */
@@ -10,15 +11,15 @@ are styled by base.css and each version's own stylesheet.
 .storybookPage {
     overflow: hidden;
     background-color: #3e8a92;
-    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261025"),
-        url("assets/storybook/backdrop.webp?v=picture-book-20261025");
+    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261026c"),
+        url("assets/storybook/backdrop.webp?v=picture-book-20261026c");
     background-position: 0 0, center;
     background-size: 20rem, cover;
 }
 
 .storybookStage {
     --gap: clamp(0.5rem, 2vmin, 1.25rem);
-    --controlSize: clamp(3.5rem, 10vmin, 6rem);
+    --controlSize: clamp(4.75rem, 11vmin, 6.5rem);
     position: fixed;
     inset: 0;
     display: grid;
@@ -271,32 +272,135 @@ hover, as if the button were being pressed down.
     right: var(--gap);
 }
 
+/* A closed book is enlarged, so its arrow is scaled back to the size of the other buttons. */
+.book[data-spread="0"] .turnButton {
+    scale: calc(1 / var(--closedScale, 1));
+}
+
 /* A button that has nothing to do fades away instead of jumping out of place. */
 .bookButton.isResting {
     opacity: 0;
     pointer-events: none;
 }
 
-/* Grown-up note */
+/* Grown-ups corner */
 
-/* The note for grown-ups is small, sits in a corner beside the cover and only shows while shut. */
-.grownUpNote {
+/*
+A small, plain label in the top corner, so it does not invite a child's tap. It opens only when
+held for a moment, and a band fills behind the words to show the hold working.
+*/
+.grownUpButton {
     position: fixed;
-    bottom: var(--gap);
+    top: var(--gap);
     left: var(--gap);
-    width: min(17rem, 22vw);
-    margin: 0;
-    padding: 0.45rem 0.7rem;
+    z-index: 60;
+    overflow: hidden;
+    padding: 0.55rem 0.9rem;
+    border: 0;
     border-radius: 0.6rem;
-    background-color: rgb(253 240 216 / 90%);
-    font-size: 0.75rem;
-    line-height: 1.4;
+    background-color: rgb(253 240 216 / 80%);
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
     transition: opacity 0.4s ease-out;
 }
 
-.isBookOpen .grownUpNote {
+.grownUpLabel {
+    position: relative;
+    z-index: 1;
+}
+
+.grownUpFill {
+    position: absolute;
+    inset: 0;
+    background-color: var(--butterYellow);
+    scale: 0 1;
+    transform-origin: 0 50%;
+}
+
+.grownUpButton.isHolding .grownUpFill {
+    scale: 1 1;
+    transition: scale var(--holdTime, 1.5s) linear;
+}
+
+.grownUpButton:focus-visible {
+    outline: 4px solid var(--cream);
+    outline-offset: 0.2rem;
+}
+
+.isBookOpen .grownUpButton {
     opacity: 0;
     pointer-events: none;
+}
+
+/* The panel is written for grown-ups, in large, plain text. */
+.grownUpPanel {
+    width: min(36rem, 100vw - 2rem);
+    max-height: calc(100dvh - 2rem);
+    padding: 1.5rem 1.75rem;
+    border: 0;
+    border-radius: 1rem;
+    background-color: var(--cream);
+    color: var(--ink);
+    font-size: 1.125rem;
+    line-height: 1.5;
+}
+
+.grownUpPanel::backdrop {
+    background-color: rgb(38 56 50 / 55%);
+}
+
+.grownUpPanel h2 {
+    margin: 0 4.5rem 0.5rem 0;
+    font-size: 1.6rem;
+}
+
+.grownUpPanel h3 {
+    margin: 1.1rem 0 0.3rem;
+    font-size: 1.2rem;
+}
+
+.grownUpPanel p,
+.grownUpPanel ul {
+    margin: 0;
+}
+
+.grownUpPanel ul {
+    padding-left: 1.25rem;
+}
+
+/* The two moves are shown with the same arrow pictures as the demonstration in the gardens. */
+.grownUpPanel .mappingList {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0;
+    list-style: none;
+}
+
+.mappingList li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.mappingList img {
+    width: 3.25rem;
+    height: auto;
+    flex: none;
+}
+
+.panelClose {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 4.75rem;
 }
 
 /* Stepping into a garden */
@@ -322,7 +426,8 @@ over it, so the garden page seems to grow out of the book.
 }
 
 .isEntering .bookButton,
-.isEntering .grownUpNote {
+.isEntering .grownUpButton,
+.isEntering .turnHint {
     opacity: 0;
 }
 
@@ -332,39 +437,37 @@ over it, so the garden page seems to grow out of the book.
     transition: none;
 }
 
-/* Turn sideways */
+/* Upright screens */
 
 /*
-A phone or tablet held upright is too narrow for an open book, so, as in The Magical Pantry, it
-shows a picture asking for the screen to be turned on its side.
+An upright phone or tablet still shows the whole book, so a child can play however the screen is
+held. The open book spans the width and the arrows move underneath it, where they cover no
+picture. A quiet hint at the bottom says the book grows when the screen is turned.
 */
-.turnSideways {
+.turnHint {
     position: fixed;
-    inset: 0;
-    z-index: 80;
+    bottom: var(--gap);
+    left: 50%;
+    z-index: 55;
     display: none;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    padding: 2rem;
-    background: inherit;
-    text-align: center;
-}
-
-.turnSideways img {
-    width: min(60vw, 14rem);
-    height: auto;
-    animation: turn-hint 2.4s ease-in-out infinite;
-}
-
-.turnSideways p {
-    max-width: 16rem;
+    gap: 0.6rem;
+    width: max-content;
+    max-width: calc(100vw - 2 * var(--gap));
     margin: 0;
-    padding: 0.45rem 0.8rem;
+    padding: 0.4rem 0.9rem 0.4rem 0.5rem;
     border-radius: 0.6rem;
     background-color: rgb(253 240 216 / 90%);
-    font-size: 0.85rem;
+    font-size: 1.125rem;
+    line-height: 1.3;
+    translate: -50% 0;
+    pointer-events: none;
+}
+
+.turnHint img {
+    width: 3.5rem;
+    height: auto;
+    animation: turn-hint 2.4s ease-in-out infinite;
 }
 
 @keyframes turn-hint {
@@ -379,14 +482,24 @@ shows a picture asking for the screen to be turned on its side.
     }
 }
 
-@media (orientation: portrait) and (max-width: 600px),
-    (orientation: portrait) and (pointer: coarse) {
-    .turnSideways {
-        display: flex;
+@media (max-aspect-ratio: 4/5) {
+    .book:not([data-spread="0"]) .turnButton {
+        top: calc(100% + var(--gap));
+        translate: 0 0;
     }
 
-    .storybookStage {
-        visibility: hidden;
+    .book:not([data-spread="0"]) .backButton {
+        left: 0;
+    }
+
+    .book:not([data-spread="0"]) .nextButton {
+        right: 0;
+    }
+}
+
+@media (max-aspect-ratio: 4/5) and (pointer: coarse) {
+    .turnHint {
+        display: flex;
     }
 }
 
@@ -399,7 +512,7 @@ shows a picture asking for the screen to be turned on its side.
     }
 
     .playButton,
-    .turnSideways img,
+    .turnHint img,
     .book[data-spread="0"] .coverLeaf {
         animation: none;
     }

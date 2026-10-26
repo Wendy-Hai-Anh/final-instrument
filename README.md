@@ -13,8 +13,10 @@ and it fills the whole browser window.
   of the window as it can. Tapping the cover opens it, the big arrows on its edges or a swipe
   turn the pages and the cross closes it. The title spread reads "Once upon a time, in a garden
   full of sounds..." across both pages, then each garden's whole picture runs across a spread of
-  its own, with a small gold play button; tapping anywhere on it zooms into the garden. Phones
-  held upright are asked to turn sideways. `style.css` lays out the book and `storybook.js` turns
+  its own, with a small gold play button; tapping anywhere on it zooms into the garden. Upright
+  screens show the whole book with the arrows underneath and a quiet hint that sideways makes it
+  bigger. A small "For grown-ups" label opens, when held, a panel on how to play, what children
+  explore and how the toy keeps them safe. `style.css` lays out the book and `storybook.js` turns
   its pages, plays a soft paper rustle and zooms in and out of the gardens.
 - `base.css` holds the colour tokens and picture buttons that every page shares, and the
   responsive scene, the objects and the visual feedback that every garden shares.
@@ -22,10 +24,12 @@ and it fills the whole browser window.
 - `assets/textures/` holds the paper grain behind the page.
 - `assets/storybook/` holds the book pictures: the teal backdrop, the closed cover, the inside of
   the cover, the back board, the ribbon, the spine rings, a left and a right page for each
-  spread and the turn-sideways picture. `assets/buttons/` holds the home, arrow, close and play
-  buttons, and the round chapter buttons (each a small picture of its garden, with a gold rim
-  for the current one) and the path that joins them. Each white button is a raised picture
-  that turns flat on hover, as if pressed.
+  spread and the turn-sideways picture. `assets/buttons/` holds the home, arrow, close, play,
+  quiet and help buttons, the floating note, and the round chapter buttons (each a small
+  picture of its garden, with a gold rim for the current one) and the path that joins them.
+  Each square button is a raised picture that turns flat on hover, as if pressed. The buttons
+  share the storybook palette: a cream paper key, warm brown lines and a gold shadow like the
+  play button.
 - `versions/` holds one folder per garden:
   - `index.html` lists the objects and sets the garden's musical key and tempo. Its home button
     and chapter buttons lead back to the book, open on that garden's pages, and on to the other
@@ -67,6 +71,18 @@ The mapping and feedback come from peer testing of the eight Assignment 2 protot
   adapted from Prototype 5.
 - **Every note moves the object,** adapted from Prototype 8. Tools sway, animals hop and fruits
   swell, which reuses Prototype 4's grow-and-bounce as a repeating effect.
+- **Playing objects glow.** A playing object keeps a soft halo in the garden's colour that
+  pulses with each note, and a small note floats up from it, so a child can see which objects
+  are making music.
+- **Quiet and help.** The pause button in the top corner stops every sound at once. The
+  question-mark button replays a short demonstration: a see-through animal rises from the
+  ground to the sky as its notes climb, then slides to the right as its notes come faster. The
+  demonstration also plays once, silently, on a child's first visit.
+- **One look.** The orchard and meadow objects have their outlines softened towards each
+  garden's own deep colour, so they sit in those painterly pictures as the lakeside objects sit
+  in its outlined one.
+- **Hints.** When a garden opens, and after 20 seconds of quiet, the playable objects wiggle one
+  after another, so they stand apart from the flowers, basket and lake in the picture.
 - **Drop to place.** Putting an object down plays one note from its new place, and a small
   ripple spreads across the ground, adapted from Prototype 6.
 - **Controlled randomness.** Each note is picked at random from its zone, never the same note
@@ -75,6 +91,27 @@ The mapping and feedback come from peer testing of the eight Assignment 2 protot
   keys move them.
 
 Prototype 2's continuous pitch and Prototype 7's continuous spinning are not used.
+
+## Designed for young children
+
+The toy is made for toddlers (about 1 to 3 years) playing with a grown-up nearby, following
+guidance on kid-friendly UX:
+
+- **Big targets.** Every button is at least 75 pixels across, and objects have an invisible
+  margin so small fingers can hit them. No button sits along the bottom edge, where children tap
+  by mistake.
+- **An answer for every touch.** A pressed object squashes at once, a tap glows and sounds, and a
+  tap on the garden itself sends a small ripple.
+- **Many fingers.** Several objects can be tapped or dragged at the same time, so siblings can
+  play together. Only the first finger turns the book's pages.
+- **Pictures, not words.** Pages, buttons and gardens are pictures; the few words are for
+  grown-ups.
+- **Any way up.** The book works on an upright screen, so a child never has to turn the device.
+- **Grown-ups' corner.** Help for grown-ups is kept away from the child's buttons and opens only
+  after a press and hold. It shows the two moves with the same arrow pictures as the gardens'
+  demonstration.
+- **Play for its own sake.** There are no scores, rewards, timers, ads or sign-ups, and no
+  personal information is asked for.
 
 ## Credits
 
@@ -93,6 +130,9 @@ Prototype 2's continuous pitch and Prototype 7's continuous spinning are not use
   inside each spread from Kerrygold's [The Magical Pantry](https://www.themagicalpantry.com/) by
   Makemepulse, which also asks phones to be turned sideways, and the zoom from the open book into its content from Ribbit's
   [Process](https://ribbit.dk/process/) page. No code or artwork was taken from them.
+- The kid-friendly guidelines come from KidsWorldFun's "Kid-Friendly UX: Ensuring Website
+  Accessibility", Smart Interface Design Patterns' "A Practical Guide To Design For Children",
+  DesignCrowd's "7 Tips for Designing a Website for Kids" and Gapsy Studio's "UX Design for Kids".
 - The lettering in the storybook pictures uses the Fredoka and Gochi Hand fonts from Google Fonts
   (SIL Open Font License). It is part of the pictures, so the pages load no fonts.
 
