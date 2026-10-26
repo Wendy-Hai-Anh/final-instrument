@@ -5,11 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Garden of Sounds: Painted Orchard</title>
-    <link rel="stylesheet" href="../../base.css?v=picture-book-20261026d">
-    <link rel="stylesheet" href="style.css?v=picture-book-20261026d">
+    <link rel="stylesheet" href="../../base.css?v=picture-book-20261027a">
+    <link rel="stylesheet" href="style.css?v=picture-book-20261027a">
     <script src="https://cdn.jsdelivr.net/npm/tone@15.1.22/build/Tone.js" defer></script>
-    <script src="../../garden.js?v=picture-book-20261026d" defer></script>
-    <script src="../../button-press.js?v=picture-book-20261026d" defer></script>
+    <script src="../../garden.js?v=picture-book-20261027a" defer></script>
+    <script src="../../button-press.js?v=picture-book-20261027a" defer></script>
 </head>
 
 <body>
@@ -26,35 +26,35 @@
     <header>
         <h1 class="visuallyHidden">Garden of Sounds</h1>
         <nav class="storyNav" aria-label="Storybook">
-            <a class="homeButton" href="../../index.html?v=picture-book-20261026d#painted-orchard">
-                <img class="buttonImage" src="../../assets/buttons/home-raised.webp?v=picture-book-20261026d"
+            <a class="homeButton" href="../../index.html?v=picture-book-20261027a#painted-orchard">
+                <img class="buttonImage" src="../../assets/buttons/home-raised.webp?v=picture-book-20261027a"
                     alt="Back to the storybook" width="280" height="280">
-                <img class="buttonHover" src="../../assets/buttons/home.webp?v=picture-book-20261026d" alt=""
+                <img class="buttonHover" src="../../assets/buttons/home.webp?v=picture-book-20261027a" alt=""
                     width="280" height="280">
             </a>
             <ol class="chapterRow">
                 <li>
-                    <a class="chapterButton" href="../lakeside-picnic/index.html?v=picture-book-20261026d">
-                        <img class="buttonImage" src="../../assets/buttons/garden-1.webp?v=picture-book-20261026d"
+                    <a class="chapterButton" href="../lakeside-picnic/index.html?v=picture-book-20261027a">
+                        <img class="buttonImage" src="../../assets/buttons/garden-1.webp?v=picture-book-20261027a"
                             alt="Lakeside picnic" width="200" height="200">
-                        <img class="buttonHover" src="../../assets/buttons/garden-1-gold.webp?v=picture-book-20261026d"
+                        <img class="buttonHover" src="../../assets/buttons/garden-1-gold.webp?v=picture-book-20261027a"
                             alt="" width="200" height="200">
                     </a>
                 </li>
                 <li>
-                    <a class="chapterButton" href="../painted-orchard/index.html?v=picture-book-20261026d"
+                    <a class="chapterButton" href="../painted-orchard/index.html?v=picture-book-20261027a"
                         aria-current="page">
-                        <img class="buttonImage" src="../../assets/buttons/garden-2.webp?v=picture-book-20261026d"
+                        <img class="buttonImage" src="../../assets/buttons/garden-2.webp?v=picture-book-20261027a"
                             alt="Painted orchard" width="200" height="200">
-                        <img class="buttonHover" src="../../assets/buttons/garden-2-gold.webp?v=picture-book-20261026d"
+                        <img class="buttonHover" src="../../assets/buttons/garden-2-gold.webp?v=picture-book-20261027a"
                             alt="" width="200" height="200">
                     </a>
                 </li>
                 <li>
-                    <a class="chapterButton" href="../flower-meadow/index.html?v=picture-book-20261026d">
-                        <img class="buttonImage" src="../../assets/buttons/garden-3.webp?v=picture-book-20261026d"
+                    <a class="chapterButton" href="../flower-meadow/index.html?v=picture-book-20261027a">
+                        <img class="buttonImage" src="../../assets/buttons/garden-3.webp?v=picture-book-20261027a"
                             alt="Giant flower meadow" width="200" height="200">
-                        <img class="buttonHover" src="../../assets/buttons/garden-3-gold.webp?v=picture-book-20261026d"
+                        <img class="buttonHover" src="../../assets/buttons/garden-3-gold.webp?v=picture-book-20261027a"
                             alt="" width="200" height="200">
                     </a>
                 </li>
@@ -62,20 +62,20 @@
         </nav>
 
         <!--
-        The pause button pauses every sound at once and then brings them back, and the help
-        button shows how height and place change the sound. They sit in the opposite top corner, away from the bottom edge.
+        The play button starts the whole garden and then becomes pause, and the help button shows
+        how height and place change the sound. They sit in the opposite top corner, away from the bottom edge.
         -->
         <div class="gardenTools">
             <button class="toolButton quietButton" type="button">
-                <img class="buttonImage" src="../../assets/buttons/quiet-raised.webp?v=picture-book-20261026d"
-                    alt="Pause all sounds" width="280" height="280" draggable="false">
-                <img class="buttonHover" src="../../assets/buttons/quiet.webp?v=picture-book-20261026d" alt=""
+                <img class="buttonImage" src="../../assets/buttons/resume-raised.webp?v=picture-book-20261027a"
+                    alt="Play the whole garden" width="280" height="280" draggable="false">
+                <img class="buttonHover" src="../../assets/buttons/resume.webp?v=picture-book-20261027a" alt=""
                     width="280" height="280" draggable="false">
             </button>
             <button class="toolButton helpButton" type="button">
-                <img class="buttonImage" src="../../assets/buttons/help-raised.webp?v=picture-book-20261026d"
+                <img class="buttonImage" src="../../assets/buttons/help-raised.webp?v=picture-book-20261027a"
                     alt="Show how to play" width="280" height="280" draggable="false">
-                <img class="buttonHover" src="../../assets/buttons/help.webp?v=picture-book-20261026d" alt=""
+                <img class="buttonHover" src="../../assets/buttons/help.webp?v=picture-book-20261027a" alt=""
                     width="280" height="280" draggable="false">
             </button>
         </div>
@@ -102,15 +102,15 @@
             <p id="garden-scene-instructions" class="visuallyHidden">
                 Tap an object to start or stop its sound, and drag it to move it. Objects
                 higher in the garden play higher notes, and objects further right repeat
-                faster. The pause button pauses every sound and then turns into a play button
-                that brings them back, and the help button shows how it works.
+                faster. The play button starts the whole garden and then becomes pause, and the
+                help button shows how it works.
             </p>
 
             <!-- The garden is one still picture, made for each window shape. -->
             <picture>
-                <source media="(max-aspect-ratio: 3/5)" srcset="assets/backgrounds/phone.webp?v=picture-book-20261026d">
-                <source media="(max-aspect-ratio: 11/10)" srcset="assets/backgrounds/tall.webp?v=picture-book-20261026d">
-                <img class="gardenPicture" src="assets/backgrounds/wide.webp?v=picture-book-20261026d" alt="">
+                <source media="(max-aspect-ratio: 3/5)" srcset="assets/backgrounds/phone.webp?v=picture-book-20261027a">
+                <source media="(max-aspect-ratio: 11/10)" srcset="assets/backgrounds/tall.webp?v=picture-book-20261027a">
+                <img class="gardenPicture" src="assets/backgrounds/wide.webp?v=picture-book-20261027a" alt="">
             </picture>
 
             <div class="rippleLayer" aria-hidden="true"></div>
@@ -122,25 +122,25 @@
                 <!-- Gardening tools sit beside the rows of seedlings. -->
                 <li id="garden-rake" class="gardenObject" data-category="gardening-tool">
                     <button class="objectButton" type="button" aria-pressed="false">
-                        <img class="objectImage" src="assets/objects/garden-rake.webp?v=picture-book-20261026d"
+                        <img class="objectImage" src="assets/objects/garden-rake.webp?v=picture-book-20261027a"
                             alt="Rake" width="191" height="437" draggable="false">
                     </button>
                 </li>
                 <li id="flower-pot" class="gardenObject" data-category="gardening-tool">
                     <button class="objectButton" type="button" aria-pressed="false">
-                        <img class="objectImage" src="assets/objects/flower-pot.webp?v=picture-book-20261026d"
+                        <img class="objectImage" src="assets/objects/flower-pot.webp?v=picture-book-20261027a"
                             alt="Flowerpot" width="211" height="249" draggable="false">
                     </button>
                 </li>
                 <li id="hand-trowel" class="gardenObject" data-category="gardening-tool">
                     <button class="objectButton" type="button" aria-pressed="false">
-                        <img class="objectImage" src="assets/objects/hand-trowel.webp?v=picture-book-20261026d"
+                        <img class="objectImage" src="assets/objects/hand-trowel.webp?v=picture-book-20261027a"
                             alt="Trowel" width="321" height="161" draggable="false">
                     </button>
                 </li>
                 <li id="watering-can" class="gardenObject" data-category="gardening-tool">
                     <button class="objectButton" type="button" aria-pressed="false">
-                        <img class="objectImage" src="assets/objects/watering-can.webp?v=picture-book-20261026d"
+                        <img class="objectImage" src="assets/objects/watering-can.webp?v=picture-book-20261027a"
                             alt="Watering can" width="368" height="276" draggable="false">
                     </button>
                 </li>
@@ -148,19 +148,19 @@
                 <!-- Animals stay in the tree, by the foxgloves and on the stone. -->
                 <li id="garden-bird" class="gardenObject" data-category="animal">
                     <button class="objectButton" type="button" aria-pressed="false">
-                        <img class="objectImage" src="assets/objects/garden-bird.webp?v=picture-book-20261026d"
+                        <img class="objectImage" src="assets/objects/garden-bird.webp?v=picture-book-20261027a"
                             alt="Bird" width="256" height="214" draggable="false">
                     </button>
                 </li>
                 <li id="garden-butterfly" class="gardenObject" data-category="animal">
                     <button class="objectButton" type="button" aria-pressed="false">
-                        <img class="objectImage" src="assets/objects/butterfly.webp?v=picture-book-20261026d"
+                        <img class="objectImage" src="assets/objects/butterfly.webp?v=picture-book-20261027a"
                             alt="Butterfly" width="239" height="200" draggable="false">
                     </button>
                 </li>
                 <li id="garden-snail" class="gardenObject" data-category="animal">
                     <button class="objectButton" type="button" aria-pressed="false">
-                        <img class="objectImage" src="assets/objects/garden-snail.webp?v=picture-book-20261026d"
+                        <img class="objectImage" src="assets/objects/garden-snail.webp?v=picture-book-20261027a"
                             alt="Snail" width="321" height="230" draggable="false">
                     </button>
                 </li>
@@ -168,19 +168,19 @@
                 <!-- Fruits have fallen beside the basket under the orchard tree. -->
                 <li id="green-pear" class="gardenObject" data-category="fruit">
                     <button class="objectButton" type="button" aria-pressed="false">
-                        <img class="objectImage" src="assets/objects/green-pear.webp?v=picture-book-20261026d"
+                        <img class="objectImage" src="assets/objects/green-pear.webp?v=picture-book-20261027a"
                             alt="Pear" width="179" height="239" draggable="false">
                     </button>
                 </li>
                 <li id="red-apple" class="gardenObject" data-category="fruit">
                     <button class="objectButton" type="button" aria-pressed="false">
-                        <img class="objectImage" src="assets/objects/red-apple.webp?v=picture-book-20261026d"
+                        <img class="objectImage" src="assets/objects/red-apple.webp?v=picture-book-20261027a"
                             alt="Apple" width="211" height="228" draggable="false">
                     </button>
                 </li>
                 <li id="strawberry" class="gardenObject" data-category="fruit">
                     <button class="objectButton" type="button" aria-pressed="false">
-                        <img class="objectImage" src="assets/objects/strawberry.webp?v=picture-book-20261026d"
+                        <img class="objectImage" src="assets/objects/strawberry.webp?v=picture-book-20261027a"
                             alt="Strawberry" width="167" height="195" draggable="false">
                     </button>
                 </li>

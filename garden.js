@@ -7,9 +7,9 @@ moves it. Each kind of action has its own feedback: a press squashes the object 
 glows, every note moves the object, a drop sends a ripple across the ground, and a tap on the
 garden itself sends a small ripple too, so no touch goes unanswered. Several fingers can play
 different objects at the same time. A playing object keeps a soft halo and sends up a small note
-with every sound, the pause button pauses everything and then turns into a play button that brings
-it back, and the help button replays a short demonstration of how height and place change the
-sound.
+with every sound, the play button starts the whole garden in a shuffled order and then becomes a
+pause button, and the help button replays a short demonstration of how height and place change
+the sound.
 */
 
 /* Page elements and settings ------------------------------------------------ */
@@ -491,6 +491,25 @@ function addRipple(x, y, width) {
 
 /* Tapping ------------------------------------------------------------------- */
 let pausedObjects = [];
+let gardenStartTimers = [];
+let isStartingGarden = false;
+
+function shuffleObjects(objects) {
+    const shuffled = [...objects];
+
+    for (let index = shuffled.length - 1; index > 0; index -= 1) {
+        const swapIndex = Math.floor(Math.random() * (index + 1));
+        [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+    }
+
+    return shuffled;
+}
+
+function cancelGardenStart() {
+    gardenStartTimers.forEach(timer => clearTimeout(timer));
+    gardenStartTimers = [];
+    isStartingGarden = false;
+}
 
 function setPlaying(gardenObject, isPlaying) {
     gardenObject.isPlaying = isPlaying;
@@ -503,44 +522,70 @@ function setPlaying(gardenObject, isPlaying) {
 }
 
 /*
-The pause key always shows what it will do. With sounds playing it shows pause; after a press it
-shows play, which brings the same sounds back; with nothing to pause it fades back, and a press
-only shakes it.
+The garden key always shows what it will do. At rest it shows play and starts every object in a
+shuffled order. While sounds are active it shows pause, and after pausing it shows play so the same
+objects can return.
 */
 function updateQuietButton() {
     const isPaused = pausedObjects.length > 0;
-    const key = isPaused ? "resume" : "quiet";
+    const isActive = isStartingGarden || hasPlayingObject();
+    const key = isPaused || !isActive ? "resume" : "quiet";
     const [raised, flat] = quietButton.querySelectorAll("img");
 
     raised.src = buttonSource(`${key}-raised`);
     flat.src = buttonSource(key);
-    raised.alt = isPaused ? "Play the sounds again" : "Pause all sounds";
-    quietButton.classList.toggle("isIdle", !isPaused && !hasPlayingObject());
+    raised.alt = isPaused ? "Play the sounds again" :
+        isActive ? "Pause all sounds" : "Play the whole garden";
+}
+
+async function startObjects(objects, message) {
+    if (!(await prepareAudio())) return;
+
+    cancelGardenStart();
+    pausedObjects = [];
+    isStartingGarden = true;
+    updateQuietButton();
+
+    let elapsed = 0;
+    const shuffled = shuffleObjects(objects);
+
+    shuffled.forEach((gardenObject, index) => {
+        const timer = setTimeout(() => {
+            if (!gardenObject.isPlaying) {
+                setPlaying(gardenObject, true);
+                updatePlace(gardenObject);
+                playNote(gardenObject, Tone.immediate() + 0.02, 0.6);
+                glowObject(gardenObject);
+            }
+
+            if (index === shuffled.length - 1) {
+                gardenStartTimers = [];
+                isStartingGarden = false;
+                updateQuietButton();
+                announce(message);
+            }
+        }, elapsed);
+
+        gardenStartTimers.push(timer);
+        elapsed += 120 + Math.random() * 180;
+    });
 }
 
 async function pauseOrResume() {
     if (pausedObjects.length > 0) {
-        if (!(await prepareAudio())) return;
-
         const paused = pausedObjects;
-        paused.forEach(gardenObject => {
-            setPlaying(gardenObject, true);
-            playNote(gardenObject, Tone.immediate() + 0.02, 0.6);
-            glowObject(gardenObject);
-        });
-        announce("Playing again.");
+        await startObjects(paused, "Playing again.");
         return;
     }
 
     const playing = gardenObjects.filter(gardenObject => gardenObject.isPlaying);
 
     if (playing.length === 0) {
-        quietButton.classList.remove("isShaking");
-        void quietButton.offsetWidth;
-        quietButton.classList.add("isShaking");
-        announce("Nothing is playing.");
+        await startObjects(gardenObjects, "The whole garden is playing.");
         return;
     }
+
+    cancelGardenStart();
 
     // Each object glows once as it pauses.
     playing.forEach(gardenObject => {
@@ -624,9 +669,11 @@ async function dropObject(gardenObject, canStartAudio) {
 
     const isReady = canStartAudio ? await prepareAudio() : audioIsRunning();
 
-    // A resting object answers with one note from its new place, as Prototype 1 did on release.
-    if (isReady && !gardenObject.isPlaying) {
+    // Dropping an object starts its repeating pattern from the new position.
+    if (isReady) {
+        if (!gardenObject.isPlaying) setPlaying(gardenObject, true);
         playNote(gardenObject, Tone.immediate() + 0.02, 0.6);
+        glowObject(gardenObject);
     }
 }
 

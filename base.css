@@ -29,7 +29,7 @@ body {
     margin: 0;
     color: var(--ink);
     background-color: var(--cream);
-    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261026d");
+    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261027a");
     background-size: 20rem;
     font-family: Georgia, "Times New Roman", serif;
 }
@@ -151,7 +151,7 @@ least 75 pixels across, a size small fingers can hit.
     right: calc(var(--buttonSize) * 0.4);
     left: calc(var(--buttonSize) * 0.4);
     height: calc(var(--buttonSize) * 0.2);
-    background: url("assets/buttons/path-across.webp?v=picture-book-20261026d") center / 100% 100%;
+    background: url("assets/buttons/path-across.webp?v=picture-book-20261027a") center / 100% 100%;
     translate: 0 -50%;
     content: "";
 }
@@ -195,31 +195,6 @@ fill the top row, so these two move down to a second row.
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     transition: opacity 0.3s ease-out;
-}
-
-/* With nothing to pause, the pause key fades back, and a press shakes its head. */
-.quietButton.isIdle {
-    opacity: 0.55;
-}
-
-.quietButton.isShaking {
-    animation: tool-shake 0.45s ease-in-out;
-}
-
-@keyframes tool-shake {
-    0%,
-    100% {
-        translate: 0 0;
-    }
-
-    25%,
-    75% {
-        translate: -0.4rem 0;
-    }
-
-    50% {
-        translate: 0.4rem 0;
-    }
 }
 
 .homeButton:focus-visible,
@@ -609,7 +584,6 @@ so one small ring now spreads flat across the ground only where an object is put
         display: none;
     }
 
-    .quietButton.isShaking,
     .isSpringing .buttonImage {
         animation: none;
     }

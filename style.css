@@ -11,8 +11,8 @@ mistake. The gardens themselves are styled by base.css and each version's own st
 .storybookPage {
     overflow: hidden;
     background-color: #3e8a92;
-    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261026d"),
-        url("assets/storybook/backdrop.webp?v=picture-book-20261026d");
+    background-image: url("assets/textures/paper-grain.webp?v=picture-book-20261027a"),
+        url("assets/storybook/backdrop.webp?v=picture-book-20261027a");
     background-position: 0 0, center;
     background-size: 20rem, cover;
 }

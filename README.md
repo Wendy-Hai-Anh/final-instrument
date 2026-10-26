@@ -29,8 +29,8 @@ and it fills the whole browser window.
   pause, play-again and help buttons, the floating note, and the round chapter buttons (each a small
   picture of its garden, with a gold rim for the current one) and the path that joins them.
   Each square button is a raised picture that turns flat while it is pressed, as if it sank into
-  its shadow, and springs back up on release (`button-press.js`); the pause button swaps to a
-  play key while sounds are paused, and the demonstration uses shadowless up and right arrows. The buttons
+  its shadow, and springs back up on release (`button-press.js`); the garden button swaps between
+  play and pause, and the demonstration uses shadowless up and right arrows. The buttons
   share the storybook palette: a cream paper key, warm brown lines and a gold shadow like the
   play button.
 - `versions/` holds one folder per garden:
@@ -77,9 +77,9 @@ The mapping and feedback come from peer testing of the eight Assignment 2 protot
 - **Playing objects glow.** A playing object keeps a soft halo in the garden's colour that
   pulses with each note, and a small note floats up from it, so a child can see which objects
   are making music.
-- **Pause and help.** The pause button in the top corner pauses every sound at once and then
-  turns into a play button that brings the same sounds back; with nothing playing it fades and
-  only shakes when pressed. The question-mark button replays a short demonstration: a big arrow
+- **Play, pause and help.** The play button starts the whole garden, with the objects joining in
+  one by one in a shuffled order. It becomes a pause button while sounds are active, and play
+  brings the same sounds back after pausing. The question-mark button replays a short demonstration: a big arrow
   leads a see-through animal up from the ground to the sky as its notes climb, then to the right
   as its notes come faster. The arrow is a plain key without a shadow and travels on the same
   line just ahead of the animal. The demonstration also plays once, silently, on a child's first
@@ -90,7 +90,8 @@ The mapping and feedback come from peer testing of the eight Assignment 2 protot
 - **Hints.** When a garden opens, and after 20 seconds of quiet, the playable objects wiggle one
   after another, so they stand apart from the flowers, basket and lake in the picture.
 - **Drop to place.** Putting an object down plays one note from its new place, and a small
-  ripple spreads across the ground, adapted from Prototype 6.
+  ripple spreads across the ground, adapted from Prototype 6. A stopped object begins repeating
+  after it is placed, so tapping and dragging both begin playback.
 - **Controlled randomness.** Each note is picked at random from its zone, never the same note
   twice running, with small changes in loudness. Animals sometimes rest between notes.
 - **Keyboard.** Tab moves between objects, Enter or Space starts and stops them, and the arrow
