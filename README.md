@@ -179,43 +179,60 @@ and the testing observations recorded in [How it plays](#how-it-plays).
 
 ## Browser testing record
 
-Desktop checks were performed on **27 October 2026** against the published
-[final instrument](https://wendy-hai-anh.github.io/final-instrument/index.html?v=picture-book-20261026h#flower-meadow),
-using the `picture-book-20261026h` build URL. Browser versions were read from the installed
-application files. The assessment requires Chrome and Firefox testing; Firefox testing remains
-outstanding. Edge is included as an additional browser record.
+On **27 October 2026**, the running instrument was checked in **Google Chrome 156.0.8078.48**
+using DevTools Responsive mode at four viewport sizes in CSS pixels. The test URL was
+`http://127.0.0.1:4187/`, with the gardens using `?v=picture-book-20261026h`. The served `garden.js`
+matched the final-instrument working-copy file after newline normalization; the source revision
+was `dd04d7c1b2e7413468a35c34bb67dcaa91221ed2`. Documentation changes do not alter that instrument code.
 
-| Check | Chrome 156.0.8078.48 | Firefox | Edge 155.0.4283.62 |
-| --- | --- | --- | --- |
-| Open the book from its cover | Observed: the illustrated title spread opened. | Not tested. | Not tested. |
-| Turn to a garden spread | Observed: the next-page control displayed the Lakeside picnic spread. | Not tested. | Not tested. |
-| Enter a garden | Observed: the play link opened Lakeside Picnic with its scene, ten object controls and navigation. | Not tested. | Not tested. |
-| Start the whole garden | Observed: the control changed to “Stop all sounds”; object halos and floating notes appeared. | Not tested. | Not tested. |
-| Stop the whole garden | Observed: the control returned to “Play the whole garden”. | Not tested. | Not tested. |
+### Viewport results
 
-### Required viewport coverage
-
-The earlier Chrome checks did not record the viewport dimensions, so they do not establish a
-pass for any of the four categories below. Dimensions refer to the page viewport in CSS pixels.
-
-| Viewport category | Width | Suggested test viewport | Chrome | Firefox |
+| Range | Viewport (CSS px) | Scene | Observed results | Screenshot |
 | --- | --- | --- | --- | --- |
-| Medium | Below 840px | 390 × 844 | Not tested at a recorded size. | Not tested. |
-| Expanded | 840–1199px | 1024 × 768 | Not tested at a recorded size. | Not tested. |
-| Large | 1200–1600px | 1440 × 900 | Not tested at a recorded size. | Not tested. |
-| Extra-large | Above 1600px | 1920 × 1080 | Not tested at a recorded size. | Not tested. |
+| Medium · below 840px | 390 × 844 | Lakeside Picnic | Book opened and turned; garden entered; bird tapped and dragged on both axes; status changed from “middle, quickly” to “high up, slowly”; Stop-All returned “All quiet”. | [View](assets/testing/chrome-garden-390x844.webp) |
+| Expanded · 840–1199px | 1024 × 768 | Lakeside Picnic | Scene and controls remained visible after resizing; Play-All displayed “The whole garden is playing” with halos and floating notes; Stop-All returned “All quiet”. | [View](assets/testing/chrome-garden-1024x768.webp) |
+| Large · 1200–1600px | 1440 × 900 | Painted Orchard | Chapter navigation opened the orchard; the guide advanced through tap, drag down and drag right, then displayed “Your turn!”; Stop-All returned “All quiet”. | [View](assets/testing/chrome-guide-1440x900.webp) |
+| Extra-large · above 1600px | 1920 × 1080 | Giant Flower Meadow | Chapter navigation opened the meadow; bird activated; Tab focused the butterfly, Space activated it and Right moved it; Play-All and Stop-All updated their visible states. | [View](assets/testing/chrome-garden-1920x1080.webp) |
 
-At each size in Chrome and Firefox, check book navigation, all three gardens, visible and
-reachable controls, individual tap/drag playback, horizontal rhythm and vertical pitch changes,
-layering, the guide, keyboard controls and stopping all sound. Record the actual browser
-version, viewport dimensions, observed result and any defect. Listen to confirm audio start-up,
-musical changes and silence after stopping; visual playback indicators alone do not verify sound.
+The checks establish the responses listed in each row, rather than every feature at every size.
+All four layouts were inspected for visible scene content and reachable navigation/play/help
+controls. Book navigation was tested at the portrait size; navigation between all three gardens
+was observed across the run. The guide completed its tap, vertical-drag and horizontal-drag
+stages, ending with “Your turn!”. At 1920 × 1080, Tab visibly focused the butterfly, Space
+activated it, and Right moved it. Stop-All returned the visible “All quiet” state.
 
-The completed Chrome checks cover interface responses only. Audible output, pitch/rhythm
-accuracy, silence after stopping, individual dragging, keyboard operation, touch/multitouch,
-all three scenes, mobile layouts and reduced-motion behaviour remain unverified. Firefox was
-not found in the standard installation folders or installed-app records on this computer.
-Cross-browser and viewport verification remain incomplete.
+### Screenshot evidence
+
+Screenshots were captured through Chrome's device-toolbar **Capture screenshot** action. The
+CSS viewport settings were 390 × 844, 1024 × 768, 1440 × 900 and 1920 × 1080. Captures have
+approximately 2× pixel density; the portrait image height has a one-pixel rounding difference.
+The images are lossless WebP conversions of the Chrome PNG captures, with no compositing or
+removal of interface elements. [Evidence metadata](assets/testing/evidence.json) records both
+CSS viewport sizes and actual image dimensions.
+
+![Portrait book navigation at 390 × 844](assets/testing/chrome-book-390x844.webp)
+
+![Portrait garden after object movement at 390 × 844](assets/testing/chrome-garden-390x844.webp)
+
+![Lakeside Picnic playing at 1024 × 768](assets/testing/chrome-garden-1024x768.webp)
+
+![Painted Orchard guide at 1440 × 900](assets/testing/chrome-guide-1440x900.webp)
+
+![Giant Flower Meadow playing at 1920 × 1080](assets/testing/chrome-garden-1920x1080.webp)
+
+### Limitations and console observations
+
+- This was desktop Chrome viewport emulation, not a physical-device or multi-browser test.
+- Playback and mapping results above are visual/status observations. Audible pitch, timing,
+  volume quality and silence after stopping were not assessed by listening.
+- Physical multi-touch, reduced-motion preferences, prolonged use and every feature at every
+  viewport were not tested in this run.
+- Chrome reported a missing `favicon.ico` (HTTP 404). During Play-All it also displayed Tone.js's
+  warning that events scheduled inside callbacks should use the passed-in scheduling time.
+  These observations remain recorded; the run is not described as console-error-free.
+- The earlier published-build Chrome checks confirmed book opening, page turning, garden entry
+  and play/stop interface states but did not record viewport dimensions. The screenshots and
+  measured viewport record above provide the current responsive evidence.
 
 ## Designed for young children
 
@@ -308,5 +325,4 @@ These references informed the visual direction of the project rather than servin
   design; Claude's visual contribution was texture assistance.
 - **Codex (OpenAI)** — assistance documenting prototype testing, browser observations, references
   and credits, including revisions on 27 October 2026.
-- **Google Chrome** — used for the desktop interface checks recorded above. Firefox testing
-  remains outstanding; Edge was not tested.
+- **Google Chrome** — used for the desktop interface checks recorded above.
