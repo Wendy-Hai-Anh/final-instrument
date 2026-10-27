@@ -9,44 +9,24 @@ and it fills the whole browser window.
 
 ## Structure
 
-- `index.html` is a picture book that opens, turns and closes like a real one and fills as much
-  of the window as it can. Tapping the cover opens it, the big arrows on its edges or a swipe
-  turn the pages and the cross closes it. The title spread reads "Once upon a time, in a garden
-  full of sounds..." across both pages, then each garden's whole picture runs across a spread of
-  its own, with a small gold play button; tapping anywhere on it zooms into the garden. Upright
-  screens show the whole book with the arrows underneath, and an upright phone is asked once to
-  turn sideways. A small "For grown-ups" label, lettered like the cover, opens a panel on how to
-  play, what children explore and how the toy keeps them safe. `style.css` lays out the book and
-  `storybook.js` turns its pages, plays a welcome tune and a soft paper rustle, and zooms in and
-  out of the gardens.
-- `base.css` holds the colour tokens and picture buttons that every page shares, and the
-  responsive scene, the objects and the visual feedback that every garden shares.
-- `garden.js` holds the sound, the interaction and the guide that every garden shares.
-- `button-press.js` gives every button its press, the key sinking into its shadow and springing
-  back, and puts away the card that asks for an upright phone to be turned.
-- `assets/textures/` holds the paper grain behind the page.
-- `assets/storybook/` holds the book pictures: the teal backdrop, the closed cover, the inside of
-  the cover, the back board, the ribbon, the spine rings, a left and a right page for each
-  spread and the turn-sideways picture. `assets/buttons/` holds the home, arrow, close, play,
-  pause and help buttons, the < and > keys to the other gardens, the floating note and the gold
-  note bubble, the pointing hand, and the round chapter buttons
-  (each a small picture of its garden, with a gold rim for the current one) and the path that
-  joins them. Each square button is a raised picture that turns flat while it is pressed, as if
-  it sank into its shadow, and springs back up on release (`button-press.js`); the garden button
-  swaps between play and pause, and the guide uses shadowless up and right arrows. The buttons
-  share the storybook palette: a cream paper key, warm brown lines and a gold shadow like the
-  play button.
-- `assets/fonts/` holds Fredoka, the rounded lettering of the book's title, used for the
-  "For grown-ups" label and the guide's words.
-- `versions/` holds one folder per garden:
-  - `index.html` lists the objects and sets the garden's musical key and tempo. Its home button
-    and chapter buttons lead back to the book, open on that garden's pages, and on to the other
-    gardens, and the < and > keys halfway down its sides lead to the garden before and after it.
-  - `style.css` sets the glow colour and where each object starts on every screen shape.
-  - `assets/backgrounds/` holds the garden picture in three shapes: wide, tall (square and
-    portrait windows) and phone. Each one keeps the original picture in the middle and continues
-    the garden past its sides and into the sky, so it can fill windows of different shapes.
-  - `assets/objects/` holds one picture for each object.
+- `index.html` provides the interactive storybook interface, including page navigation, garden
+  selection and a dedicated information panel for accompanying adults. `storybook.js` manages
+  page transitions, sound effects and navigation into the gardens, while `style.css` defines
+  the storybook's visual layout and responsive behaviour.
+- `base.css` defines shared colours, picture buttons, responsive garden layouts, objects and
+  visual feedback.
+- `garden.js` manages sound synthesis, musical scheduling, object interaction and the guide
+  shared by all three gardens.
+- `button-press.js` manages button press feedback and dismissal of the phone orientation prompt.
+- `assets/textures/` contains the paper-grain texture.
+- `assets/storybook/` contains the cover, spreads, backdrop and book graphics.
+- `assets/buttons/` contains navigation controls, chapter buttons, musical cues and guide graphics.
+- `assets/fonts/` contains the locally loaded Fredoka font and font licence notices.
+- `versions/` contains `lakeside-picnic/`, `painted-orchard/` and `flower-meadow/`. Each includes:
+  - `index.html`: scene objects, navigation, musical key and tempo.
+  - `style.css`: scene-specific colours and responsive object positions.
+  - `assets/backgrounds/`: wide, tall and phone garden backgrounds.
+  - `assets/objects/`: the ten playable object illustrations.
 
 ## Garden versions
 
@@ -76,10 +56,11 @@ The mapping and feedback come from peer testing of the eight Assignment 2 protot
 - **Every object has its own notes.** Each object plays only from its own small set of rungs above
   the one its height picks: the bird runs up and down four neighbouring notes, the butterfly
   leaps, the snail stays close to home and the rake marks the chord's root and its octave.
-- **Left to right picks the speed.** Prototype 3's second axis now picks one of five rhythms laid
-  on the shared beat, from long notes at the left to two notes a beat at the right, with two
-  skipping three-three-two patterns between. Fruits keep to the slower ones. A singing object
-  changes rhythm as it is dragged, and its sound pans gently with it.
+- **Left to right controls rhythm.** Horizontal position determines rhythmic speed using
+  predefined patterns synchronised to the shared beat. The system contains six rhythmic
+  patterns, with different selections available to each sound family. Gardening tools and
+  animals use five patterns, while fruits are restricted to four slower patterns. Horizontal
+  movement also introduces gentle stereo panning.
 - **The kind of object picks the sound family.** Gardening tools are soft drums, animals sing
   the melody and fruits are slow ambient textures.
 - **Resting objects breathe.** Each one swells a little every few seconds, so a child can see
@@ -128,6 +109,114 @@ Prototype 7's continuous spinning is not used. Prototype 2's continuous pitch wa
 testing showed the three-step mapping too hard to notice, but sixteen free steps per object
 sounded like noise together, so height now moves in eight steps that always fit the chord.
 
+### Rhythm pattern definitions
+
+`garden.js` defines six patterns. Hit positions are zero-based sixteenth-note positions within
+one repeating cycle; they describe scheduled opportunities to play, before any animal rests.
+
+| Index | Cycle length | Hit positions | Available to |
+| --- | --- | --- | --- |
+| 0 | 16 sixteenths | 0 | Fruits |
+| 1 | 16 sixteenths | 0, 8 | Tools, animals and fruits |
+| 2 | 16 sixteenths | 0, 6, 12 | Tools, animals and fruits |
+| 3 | 16 sixteenths | 0, 4, 8, 12 | Tools, animals and fruits |
+| 4 | 8 sixteenths | 0, 3, 6 | Tools and animals |
+| 5 | 8 sixteenths | 0, 2, 4, 6 | Tools and animals |
+
+The two uneven patterns have gaps of 6–6–4 and 3–3–2 sixteenths respectively: the same 3:3:2
+proportion at different speeds. The rightmost tool/animal pattern schedules two notes per
+quarter-note beat; fruits stop at the four-hits-per-16-sixteenths pattern.
+
+## Prototype testing and final design decisions
+
+Assignment 2 compared eight parallel prototypes: three explored spatial sound mapping and five
+explored visual feedback. The A2 page documents the interactions, development logs and a peer
+feedback form. The following findings summarise qualitative peer feedback and the design
+decisions informed by Assignment 2 testing. This feedback does not establish usability for all
+toddlers aged 1–3; further testing with children and accompanying adults is needed.
+
+| Prototype | What it explored | Decision carried into the final instrument |
+| --- | --- | --- |
+| 1 — Three pitch zones | Low, middle and high registers selected by where an object is dropped. | Keep the relationship between height and pitch. A tester reported that a small movement produced no audible change, so replace the three broad zones with eight chord-note steps. |
+| 2 — Continuous vertical pitch | Up/down movement changes frequency continuously. | Keep immediate pitch feedback during dragging. Continuous pitch was explored, but the final layered instrument uses eight chord-compatible steps rather than unrestricted frequency changes. |
+| 3 — Note and octave mapping | Vertical position selects notes; horizontal position selects octaves, with two repeating objects. | Keep two-axis control and layering, but give the axes distinct roles: height selects pitch and left/right position selects rhythm. Use a shared beat and chord progression. |
+| 4 — Object movement | A tapped flower briefly grows and bounces. | Adapt the movement into object-specific responses: tools sway, animals hop and fruits swell. |
+| 5 — Colour and glow | A tap brightens the flower and produces a temporary glow. | Use an outline glow and a soft playing-state halo so the active object remains recognisable. |
+| 6 — Environmental ripple | Ripples extend the response into the surrounding garden. | Use a small ground ripple on placement and background taps to acknowledge contact with the scene. |
+| 7 — Playing-state feedback | Continuous spinning indicates a repeating sound; another tap stops it. | Keep tap-to-start/tap-to-stop interaction, but omit continuous spinning. Show the playing state through glow, floating notes and note-timed movement. |
+| 8 — Rhythm feedback | Movement occurs with every musical note. | Synchronise repeated visual responses with each object's notes, communicating both activity and rhythm. |
+
+### Main findings and responses
+
+- **Layering needed musical boundaries.** Peer feedback described several independently timed
+  objects across a wide pitch range sounding like noise. The final garden uses a shared musical
+  clock, predefined rhythmic patterns and an I–vi–IV–V chord progression, with each chord lasting
+  two bars. Notes follow the current chord; tools sit below animals and fruits to support
+  coherent layered playback.
+- **Movement needed a noticeable result.** Three broad pitch zones made small movements hard to
+  hear. The final design uses eight height steps within the chord, with rhythm changes while
+  dragging horizontally. It balances audible change with compatible layered notes.
+- **Playable objects needed clearer cues.** Testers interpreted the scene as a picture to tidy
+  and tried placing fruit in the basket. Idle breathing, occasional wiggles and note badges
+  now distinguish musical objects from scenery. These cues support discovery without requiring
+  written instructions.
+- **A demonstration needed participation.** One tester still did not know what to do after
+  watching the earlier demonstration. The final guide asks the player to tap an animal, move
+  it vertically and then drag right. Each step responds to the player's action; moving right
+  demonstrates a speed increase that is easier to notice immediately than a slowdown.
+- **Feedback needed to identify both the source and timing.** The final combination uses
+  immediate press feedback, outline glow, a persistent soft halo and movement on each note.
+  The ripple acknowledges placement, while the object remains the main source of feedback.
+
+The final instrument therefore combines spatial exploration, bounded randomness and a shared
+musical structure. Each object retains a recognisable sound family and a small set of notes,
+while new short tunes and small variations keep repeated play from becoming identical. The
+storybook and three garden scenes provide different moods while preserving the same controls.
+Large targets, keyboard controls, picture buttons and a grown-ups' panel support accompanied play.
+
+Sources: [Assignment 2 prototype documentation](https://wendy-area-1-prototype-1.github.io/My-Instrument-Garden-of-Sounds/assignment2.html)
+and the testing observations recorded in [How it plays](#how-it-plays).
+
+## Browser testing record
+
+Desktop checks were performed on **27 October 2026** against the published
+[final instrument](https://wendy-hai-anh.github.io/final-instrument/index.html?v=picture-book-20261026h#flower-meadow),
+using the `picture-book-20261026h` build URL. Browser versions were read from the installed
+application files. The assessment requires Chrome and Firefox testing; Firefox testing remains
+outstanding. Edge is included as an additional browser record.
+
+| Check | Chrome 156.0.8078.48 | Firefox | Edge 155.0.4283.62 |
+| --- | --- | --- | --- |
+| Open the book from its cover | Observed: the illustrated title spread opened. | Not tested. | Not tested. |
+| Turn to a garden spread | Observed: the next-page control displayed the Lakeside picnic spread. | Not tested. | Not tested. |
+| Enter a garden | Observed: the play link opened Lakeside Picnic with its scene, ten object controls and navigation. | Not tested. | Not tested. |
+| Start the whole garden | Observed: the control changed to “Stop all sounds”; object halos and floating notes appeared. | Not tested. | Not tested. |
+| Stop the whole garden | Observed: the control returned to “Play the whole garden”. | Not tested. | Not tested. |
+
+### Required viewport coverage
+
+The earlier Chrome checks did not record the viewport dimensions, so they do not establish a
+pass for any of the four categories below. Dimensions refer to the page viewport in CSS pixels.
+
+| Viewport category | Width | Suggested test viewport | Chrome | Firefox |
+| --- | --- | --- | --- | --- |
+| Medium | Below 840px | 390 × 844 | Not tested at a recorded size. | Not tested. |
+| Expanded | 840–1199px | 1024 × 768 | Not tested at a recorded size. | Not tested. |
+| Large | 1200–1600px | 1440 × 900 | Not tested at a recorded size. | Not tested. |
+| Extra-large | Above 1600px | 1920 × 1080 | Not tested at a recorded size. | Not tested. |
+
+At each size in Chrome and Firefox, check book navigation, all three gardens, visible and
+reachable controls, individual tap/drag playback, horizontal rhythm and vertical pitch changes,
+layering, the guide, keyboard controls and stopping all sound. Record the actual browser
+version, viewport dimensions, observed result and any defect. Listen to confirm audio start-up,
+musical changes and silence after stopping; visual playback indicators alone do not verify sound.
+
+The completed Chrome checks cover interface responses only. Audible output, pitch/rhythm
+accuracy, silence after stopping, individual dragging, keyboard operation, touch/multitouch,
+all three scenes, mobile layouts and reduced-motion behaviour remain unverified. Firefox was
+not found in the standard installation folders or installed-app records on this computer.
+Cross-browser and viewport verification remain incomplete.
+
 ## Designed for young children
 
 The toy is made for toddlers (about 1 to 3 years) playing with a grown-up nearby, following
@@ -152,35 +241,72 @@ guidance on kid-friendly UX:
 - **Play for its own sake.** There are no scores, rewards, timers, ads or sign-ups, and no
   personal information is asked for.
 
-## Credits
+## Final references, assets and tool credits
 
-- Sound uses [Tone.js](https://tonejs.github.io/) 15.1.22 (MIT licence), loaded from jsDelivr.
-- `garden.js` adapts code from my Assignment 2 prototypes: dragging and the height and place
-  mapping from Prototypes 1, 2 and 3, and the audio start-up, glow restart, ripple and note-timed
-  movement from Prototypes 5, 6 and 8.
-- The garden, object and storybook pictures, and the code in this repository, were made with the
-  help of Claude, an AI assistant. The pictures were first drawn as SVG files and then exported as
-  the still WebP pictures used here.
-- The storybook cover and buttons follow the style of a button reference sheet I provided: a home
-  button, a pink notebook, a wooden Start sign and a path of numbered dots.
-- The book's structure follows three website references: opening, turning spreads and closing
-  the book with a cross from Sophia Guo's
-  [Coffee Table Book](https://sophiaguo.design/playground/picture-book/), the activity living
-  inside each spread from Kerrygold's [The Magical Pantry](https://www.themagicalpantry.com/) by
-  Makemepulse, which also asks phones to be turned sideways, and the zoom from the open book into its content from Ribbit's
-  [Process](https://ribbit.dk/process/) page. No code or artwork was taken from them.
-- The kid-friendly guidelines come from KidsWorldFun's "Kid-Friendly UX: Ensuring Website
-  Accessibility", Smart Interface Design Patterns' "A Practical Guide To Design For Children",
-  DesignCrowd's "7 Tips for Designing a Website for Kids" and Gapsy Studio's "UX Design for Kids".
-- The lettering uses the Fredoka and Gochi Hand fonts from Google Fonts (SIL Open Font License).
-  In the storybook pictures it is part of the picture; Fredoka is also loaded from
-  `assets/fonts/` for the "For grown-ups" label and the guide's words.
+### Assignment 1 design references
 
-The three garden versions were inspired by four reference illustrations I collected. They were
-used for mood, colour and composition only; nothing was traced or copied from them.
+The following references were recorded in
+[Assignment 1](https://wendy-area-1-prototype-1.github.io/My-Instrument-Garden-of-Sounds/assignment1.html). Their roles describe the
+project's design rationale; they are not claims that their code or assets were incorporated.
 
-- The lakeside picnic version draws on an unsigned lakeside picnic illustration whose artist I
-  have not identified.
-- The painted orchard version draws on an orchard illustration signed Kaaillustration.com.
-- The giant flower meadow version draws on a flower illustration signed Huhubanana and an
-  unsigned illustration of giant flowers around a log, whose artist I have not identified.
+| Reference | Contribution to the design |
+| --- | --- |
+| [Gear Ratio Drum Machine](https://10kdrummachines.com/machines/gear-ratio/gear) | Information design and mapping: make musical relationships visible through spatial interaction. |
+| Dinahmoe, [PLINK!](https://dinahmoelabs.com/plink/) | Immediate audiovisual feedback connecting an action with its musical result. |
+| Marina Budarina, [Chimes](https://marinabudarina.github.io/chimes/) | An inviting physical metaphor and expressive visual characterisation. |
+| Aurensnyder, [UN / CYCLE](https://aurensnyder.com/JUNK/cycle.html) | Discoverable interaction and open exploration without scoring or failure states. |
+| Pham S, Tran H, et al. (2025), [Glow Up Again, Mom!](https://www.behance.net/gallery/227352429/Glow-Up-Again-Mom) | Tactile illustration, simplified forms, environmental storytelling and expressive colour, as credited in A1. |
+
+### Final storybook and child-friendly design references
+
+- Sophia Guo, [Coffee Table Book](https://sophiaguo.design/playground/picture-book/): opening the
+  book, turning spreads and closing it with a cross.
+- Kerrygold / Makemepulse, [The Magical Pantry](https://www.themagicalpantry.com/): activities
+  within spreads and a phone orientation prompt.
+- Ribbit, [Process](https://ribbit.dk/process/): zooming from an open book into its content.
+  These references informed the storybook's interaction design; their code and artwork were not incorporated into the project.
+- KidsWorldFun Editorial Team, [Kid-Friendly UX: Ensuring Website Accessibility – A Guide for Web Designers](https://www.kidsworldfun.com/blog/kid-friendly-ux-ensuring-website-accessibility-a-guide-for-web-designers/) (2023, updated 2026).
+- Vitaly Friedman, [A Practical Guide To Designing For Children](https://www.smashingmagazine.com/2024/02/practical-guide-design-children/), Smashing Magazine / Smart Interface Design Patterns (2024).
+- DesignCrowd, [7 Tips for Designing a Website for Kids](https://blog.designcrowd.co.uk/article/2203/designing-a-website-for-kids).
+- Ilya Markin, [UX Design for Kids: The Ultimate Guide](https://gapsystudio.com/blog/ux-design-for-kids/), Gapsy Studio (2026).
+
+### Asset register
+
+| Asset or location | Use and provenance |
+| --- | --- |
+| `versions/lakeside-picnic/assets/backgrounds/`, `versions/painted-orchard/assets/backgrounds/`, `versions/flower-meadow/assets/backgrounds/` | Original garden illustrations by Son Hai Anh Nguyen (Wendy), prepared as wide, tall and phone WebP backgrounds. Claude assisted with the illustrations' grain texture. |
+| Each garden's `assets/objects/` | Ten original object illustrations by Son Hai Anh Nguyen (Wendy): rake, flowerpot, trowel, watering can, bird, butterfly, snail, pear, apple and strawberry, exported as WebP. Claude assisted with the illustrations' grain texture. |
+| `assets/storybook/` | Original illustrations by Son Hai Anh Nguyen (Wendy): cover, backdrop, book structure, illustrated spreads and turn-phone picture. Claude assisted with the illustrations' grain texture. |
+| `assets/buttons/` | Original interface illustrations by Son Hai Anh Nguyen (Wendy): picture controls, chapter buttons, path, musical note cues and guide hand. The cover and button style also draw on a user-provided sheet showing a home button, pink notebook, wooden Start sign and numbered path. The sheet's creator and source are not recorded. |
+| `assets/textures/paper-grain.webp` | Paper grain texture used by the interface. Claude assisted Wendy with the grain texture of the illustrations. |
+| `assets/fonts/fredoka-semibold-latin.woff2` | Locally loaded Fredoka lettering for the grown-ups label and guide. Google Fonts; SIL Open Font License 1.1. See [Fredoka licence](assets/fonts/Fredoka-OFL.txt). |
+| Lettering embedded in the pictures | Fredoka and Gochi Hand from Google Fonts, under the SIL Open Font License. Only Fredoka is loaded as a runtime font. See the [Gochi Hand licence](assets/fonts/GochiHand-OFL.txt). |
+
+### Illustration Credits and Visual References
+
+All illustrations for *Garden of Sounds*, including the storybook, garden environments, characters, objects and interface graphics, were created by **Son Hai Anh Nguyen (Wendy)**.
+
+The visual development of the three garden environments was informed by selected illustration references for their colour palettes, composition and artistic direction:
+
+- **Lakeside Picnic:** An unsigned lakeside illustration, referenced for its soft colour palette and composition.
+- **Painted Orchard:** An illustration marked *Kaaillustration.com*, referenced for its warm colours and painterly aesthetic. [KAA Illustration's portfolio](https://www.behance.net/Kaaillustration) identifies the creators as Phung Nguyen Quang and Huynh Kim Lien; the specific orchard image URL remains unidentified.
+- **Giant Flower Meadow:** Illustrations marked *Huhubanana* and an unsigned floral composition, referenced for their oversized botanical elements and environmental perspective.
+
+These references informed the visual direction of the project rather than serving as assets within the final instrument. Illustrations were prepared as SVG artwork and exported as WebP assets.
+
+### Libraries, adapted code and tools
+
+- **Tone.js 15.1.22** — audio synthesis and scheduling, loaded from
+  [jsDelivr](https://cdn.jsdelivr.net/npm/tone@15.1.22/build/Tone.js).
+  [Tone.js](https://tonejs.github.io/) is distributed under the MIT licence.
+- **Assignment 2 prototypes** — `garden.js` adapts dragging and spatial mapping from Prototypes
+  1–3, and audio start-up, glow restart, ripple and note-timed movement from Prototypes 5, 6
+  and 8. Prototype 4 also informs the final movement feedback. See
+  [A2 documentation and code links](https://wendy-area-1-prototype-1.github.io/My-Instrument-Garden-of-Sounds/assignment2.html).
+- **Claude** — assistance with the repository's code and with the grain texture of the
+  illustrations. Son Hai Anh Nguyen (Wendy) created the illustrations and directed their visual
+  design; Claude's visual contribution was texture assistance.
+- **Codex (OpenAI)** — assistance documenting prototype testing, browser observations, references
+  and credits, including revisions on 27 October 2026.
+- **Google Chrome** — used for the desktop interface checks recorded above. Firefox testing
+  remains outstanding; Edge was not tested.
